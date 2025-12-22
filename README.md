@@ -1,24 +1,7 @@
-# README
+# Optimus
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+* A template for a Ruby on Rails application
 
-Things you may want to cover:
+## Dependency Management
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* See [docs/dependency_management.md](docs/dependency_management.md) for Dependency Management practices

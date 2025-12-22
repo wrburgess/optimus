@@ -1,5 +1,3 @@
-# PostgreSQL configuration. Override values with environment variables as needed.
-
 default: &default
   adapter: postgresql
   encoding: unicode
@@ -16,12 +14,9 @@ development:
   <<: *local
   database: <%= ENV.fetch("POSTGRES_DB_DEVELOPMENT", "optimus_development") %>
 
-# Warning: The database defined as "test" will be erased and re-generated from
-# your development database when you run "rake".
 test:
   <<: *local
   database: <%= ENV.fetch("POSTGRES_DB_TEST", "optimus_test") %>
-
 
 production:
   primary:
