@@ -41,8 +41,8 @@ group :test do
   gem "capybara", "3.40.0"
   gem "database_cleaner-active_record", "2.2.2"
   gem "rails-controller-testing", "1.0.5"
-  gem "rspec-github", "3.0.0", require: false
-  gem "rspec-instafail", "1.0.0", require: false
+  gem "rspec-github", "3.0.0"
+  gem "rspec-instafail", "1.0.0"
   gem "rspec-json_expectations", "2.2.0"
   gem "rspec_junit_formatter", "0.6.0"
   gem "rspec-longrun", "3.1.0"
