@@ -87,23 +87,30 @@ while IFS= read -r line; do
       # Update the version in Gemfile
       # Handle both gem "name", "~> x.y" and gem "name", "x.y.z" formats
       
-      # Preserve leading whitespace (indentation)
-      LEADING_WHITESPACE=$(echo "$CURRENT_LINE" | grep -oE "^[[:space:]]*")
-      
-      # Create the new gem line with updated version
-      # Preserve the gem name quote style
-      QUOTE_STYLE=$(echo "$CURRENT_LINE" | grep -oE "gem ['\"]" | tail -c 2)
-      
-      # Build new line - use exact pinned version, preserving indentation
-      NEW_LINE="${LEADING_WHITESPACE}gem ${QUOTE_STYLE}${GEM_NAME}${QUOTE_STYLE}, ${QUOTE_STYLE}${NEWEST_VERSION}${QUOTE_STYLE}"
-      
       echo -e "${GREEN}  ✓ Updating ${GEM_NAME} to ${NEWEST_VERSION}${NC}"
       
-      # Escape special characters for sed
-      ESCAPED_CURRENT=$(echo "$CURRENT_LINE" | sed 's/[[\.*^$()+?{|]/\\&/g')
-      
-      # Replace in Gemfile
-      sed -i '' "s|${CURRENT_LINE}|${NEW_LINE}|" Gemfile
+      GEM_NAME_VALUE="$GEM_NAME"
+      NEW_VERSION_VALUE="$NEWEST_VERSION"
+      GEM_NAME="$GEM_NAME_VALUE" NEW_VERSION="$NEW_VERSION_VALUE" ruby <<'RUBY'
+path = 'Gemfile'
+name = ENV.fetch('GEM_NAME')
+new_version = ENV.fetch('NEW_VERSION')
+content = File.read(path)
+pattern = Regexp.new(%{^(\s*gem\s+['"]#{Regexp.escape(name)}['"]\s*,\s*)(['"])([^'"]+)(['"])(.*)$}, Regexp::MULTILINE)
+updated = false
+updated_content = content.gsub(pattern) do
+  updated = true
+  leading = Regexp.last_match(1)
+  quote = Regexp.last_match(2)
+  rest = Regexp.last_match(5)
+  "#{leading}#{quote}#{new_version}#{quote}#{rest}"
+end
+unless updated
+  warn "Could not update #{name} entry in Gemfile"
+  exit 1
+end
+File.write(path, updated_content)
+RUBY
       
       UPDATED_GEMS+=("${GEM_NAME}: updated to ${NEWEST_VERSION}")
     else
