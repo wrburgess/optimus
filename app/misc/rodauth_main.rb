@@ -181,11 +181,11 @@ class RodauthMain < Rodauth::Rails::Auth
     max_session_lifetime 7 * 24 * 60 * 60
 
     # WebAuthn / passkeys settings
-    webauthn_rp_name "MyApp"
+    webauthn_rp_name "Optimus"
     webauthn_rp_id   ENV.fetch("WEBAUTHN_RP_ID", "localhost")
     webauthn_origin  ENV.fetch("WEBAUTHN_ORIGIN", "http://localhost:3000")
 
     # Required by the webauthn feature (challenge integrity) :contentReference[oaicite:11]{index=11}
-    hmac_secret ENV.fetch("RODAUTH_HMAC_SECRET")
+    hmac_secret Rails.application.credentials.dig(:rodauth, :hmac_secret)
   end
 end
