@@ -11,16 +11,25 @@ NC='\033[0m' # No Color
 
 echo -e "${BLUE}=== Package Update Script ===${NC}"
 
-# Ensure we're on the main branch and up to date
+# Ensure we're on the main branch or an update branch and up to date
 echo -e "${YELLOW}Checking current branch...${NC}"
 CURRENT_BRANCH=$(git branch --show-current)
-if [ "$CURRENT_BRANCH" != "main" ]; then
-  echo -e "${RED}Please run this script from the main branch${NC}"
+
+if [ "$CURRENT_BRANCH" = "main" ]; then
+  echo -e "${YELLOW}On main branch, will create new update branch${NC}"
+  CREATE_NEW_BRANCH=true
+
+  echo -e "${YELLOW}Pulling latest changes...${NC}"
+  git pull origin main
+elif [[ "$CURRENT_BRANCH" == chore/update-packages-* ]]; then
+  echo -e "${YELLOW}On existing update branch: ${CURRENT_BRANCH}${NC}"
+  echo -e "${YELLOW}Will add updates to this branch${NC}"
+  CREATE_NEW_BRANCH=false
+  BRANCH_NAME="$CURRENT_BRANCH"
+else
+  echo -e "${RED}Please run this script from the main branch or an existing chore/update-packages-* branch${NC}"
   exit 1
 fi
-
-echo -e "${YELLOW}Pulling latest changes...${NC}"
-git pull origin main
 
 # Set yarn version to berry
 echo -e "${YELLOW}Setting yarn version to berry...${NC}"
@@ -28,104 +37,210 @@ yarn set version berry
 
 # Check for outdated packages and capture output
 echo -e "${YELLOW}Checking for outdated packages...${NC}"
-OUTDATED_OUTPUT=$(yarn outdated 2>&1 || true)
-echo "$OUTDATED_OUTPUT"
+OUTDATED_JSON_PATH=$(mktemp)
+if ! yarn outdated --json >"$OUTDATED_JSON_PATH"; then
+  STATUS=$?
+  if [ $STATUS -ne 1 ]; then
+    echo -e "${RED}yarn outdated command failed with status ${STATUS}.${NC}"
+    rm -f "$OUTDATED_JSON_PATH"
+    exit ${STATUS}
+  fi
+fi
 
-# Check if there are outdated dependencies (Yarn 4 format: "X dependency is out of date" or "X dependencies are out of date")
-if echo "$OUTDATED_OUTPUT" | grep -q "is out of date\|are out of date"; then
-  # Parse outdated packages from Yarn 4 output (look for lines with package names after the header)
-  OUTDATED_PACKAGES=$(echo "$OUTDATED_OUTPUT" | grep -E "^➤ YN0000: [a-zA-Z@]" | grep -v "Package\|Done\|Checking\|Completed" | awk '{print $3}' || true)
-else
+cat "$OUTDATED_JSON_PATH"
+
+PARSED_PACKAGES=$(OUTDATED_JSON_PATH="$OUTDATED_JSON_PATH" node <<'NODE'
+const fs = require('fs');
+const path = process.env.OUTDATED_JSON_PATH;
+if (!path) process.exit(0);
+const raw = fs.existsSync(path) ? fs.readFileSync(path, 'utf8').trim() : '';
+if (!raw) process.exit(0);
+
+const results = [];
+
+function record(entry) {
+  if (!entry) return;
+  const name = entry.name || entry.package || entry[0];
+  const current = entry.current || entry[1];
+  const latest = entry.latest || entry[2];
+  const depType = entry.type || entry['package type'] || entry[3] || 'dependency';
+  if (!name || !latest || current === latest) return;
+  results.push([String(name), String(current), String(latest), String(depType)].join('|'));
+}
+
+for (const line of raw.split(/\r?\n/)) {
+  if (!line.trim()) continue;
+  let parsed;
+  try {
+    parsed = JSON.parse(line);
+  } catch {
+    try {
+      parsed = JSON.parse(`[${line}]`);
+    } catch {
+      continue;
+    }
+  }
+
+  if (Array.isArray(parsed)) {
+    parsed.forEach(record);
+    continue;
+  }
+
+  if (parsed && parsed.type === 'table' && parsed.data && Array.isArray(parsed.data.body)) {
+    parsed.data.body.forEach(record);
+    continue;
+  }
+
+  record(parsed);
+}
+
+if (results.length) {
+  process.stdout.write(results.join('\n'));
+}
+NODE
+)
+
+rm -f "$OUTDATED_JSON_PATH"
+
+if [ -z "$PARSED_PACKAGES" ]; then
   echo -e "${GREEN}✓ No package updates needed. All packages are up to date!${NC}"
   exit 0
 fi
 
-if [ -z "$OUTDATED_PACKAGES" ]; then
+OUTDATED_PACKAGES=()
+while IFS='|' read -r NAME CURRENT_VERSION LATEST_VERSION DEP_TYPE; do
+  [ -z "$NAME" ] && continue
+  OUTDATED_PACKAGES+=("$NAME|$CURRENT_VERSION|$LATEST_VERSION|$DEP_TYPE")
+done <<< "$PARSED_PACKAGES"
+
+if [ ${#OUTDATED_PACKAGES[@]} -eq 0 ]; then
   echo -e "${GREEN}✓ No package updates needed. All packages are up to date!${NC}"
   exit 0
 fi
 
 echo -e "${YELLOW}Outdated packages found:${NC}"
-echo "$OUTDATED_PACKAGES"
+for pkg in "${OUTDATED_PACKAGES[@]}"; do
+  IFS='|' read -r NAME CURRENT_VERSION LATEST_VERSION DEP_TYPE <<< "$pkg"
+  echo "  - $NAME ($CURRENT_VERSION -> $LATEST_VERSION) [$DEP_TYPE]"
+done
 
-# Create branch name with date and time
-BRANCH_NAME="chore/update-packages-$(date +%Y-%m-%d-%H%M%S)"
-
-echo -e "${YELLOW}Creating branch: ${BRANCH_NAME}${NC}"
-git checkout -b "$BRANCH_NAME"
-
-# Capture package versions before update
-echo -e "${YELLOW}Capturing current package versions...${NC}"
-BEFORE_VERSIONS=$(cat package.json)
+# Create branch name with date and time if needed
+if [ "$CREATE_NEW_BRANCH" = true ]; then
+  BRANCH_NAME="chore/update-packages-$(date +%Y-%m-%d-%H%M%S)"
+  echo -e "${YELLOW}Creating branch: ${BRANCH_NAME}${NC}"
+  git checkout -b "$BRANCH_NAME"
+fi
 
 # Update all outdated packages to exact versions
 echo -e "${YELLOW}Updating packages...${NC}"
-for pkg in $OUTDATED_PACKAGES; do
-  echo -e "${YELLOW}Updating $pkg...${NC}"
-  # Use --exact to pin the exact version (no ^ or ~ prefix)
-  yarn up "$pkg" --exact
+for pkg in "${OUTDATED_PACKAGES[@]}"; do
+  IFS='|' read -r NAME CURRENT_VERSION LATEST_VERSION DEP_TYPE <<< "$pkg"
+  echo -e "${YELLOW}Updating ${NAME} to ${LATEST_VERSION}...${NC}"
+  # Use --exact with explicit version to avoid range loosening
+  yarn up "${NAME}@${LATEST_VERSION}" --exact
 done
 
 # Check if package.json changed
 if git diff --quiet package.json yarn.lock 2>/dev/null; then
   echo -e "${GREEN}✓ No actual changes to package.json or yarn.lock. All packages are already at latest versions.${NC}"
-  git checkout main
-  git branch -D "$BRANCH_NAME"
+  if [ "$CREATE_NEW_BRANCH" = true ]; then
+    git checkout main
+    git branch -D "$BRANCH_NAME"
+  fi
   exit 0
 fi
 
-# Generate changelog of updates
-echo -e "${YELLOW}Generating changelog...${NC}"
-CHANGES=$(git diff package.json | grep -E "^\+" | grep -v "^\+\+\+" | sed 's/^\+//' || true)
-
 # Build PR body
 PR_TITLE="chore: Update npm packages ($(date +%Y-%m-%d))"
-PR_BODY="## Package Updates
+
+PACKAGE_DIFF=$(git diff package.json)
+
+UPDATED_LIST=$(for pkg in "${OUTDATED_PACKAGES[@]}"; do
+  IFS='|' read -r NAME CURRENT_VERSION LATEST_VERSION DEP_TYPE <<< "$pkg"
+  echo "- ${NAME}: ${CURRENT_VERSION} → ${LATEST_VERSION} (${DEP_TYPE})"
+done)
+
+PR_BODY=$(cat <<'PR_BODY_EOF'
+## Package Updates
 
 This PR updates the following npm packages:
 
 ### Changes to package.json
-\`\`\`diff
-$(git diff package.json)
-\`\`\`
+
+```diff
+__PACKAGE_DIFF__
+```
 
 ### Updated packages
-$(echo "$OUTDATED_PACKAGES" | while read pkg; do
-  if [ -n "$pkg" ]; then
-    echo "- $pkg"
-  fi
-done)
+
+__UPDATED_LIST__
 
 ---
-*Generated automatically by \`bin/update-packages\`*"
+*Generated automatically by `bin/update-packages-gha`*
+PR_BODY_EOF
+)
+
+PR_BODY="${PR_BODY/__PACKAGE_DIFF__/$PACKAGE_DIFF}"
+PR_BODY="${PR_BODY/__UPDATED_LIST__/$UPDATED_LIST}"
 
 # Commit changes
 echo -e "${YELLOW}Committing changes...${NC}"
-git add package.json yarn.lock .yarn/ .yarnrc.yml 2>/dev/null || true
+git config user.name "github-actions[bot]"
+git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+# Stage required files first
+git add package.json yarn.lock
+
+# Stage optional Yarn artifacts when present
+[ -f .yarnrc.yml ] && git add .yarnrc.yml
+[ -d .yarn ] && git add .yarn
+[ -f .pnp.cjs ] && git add .pnp.cjs
+[ -f .pnp.loader.mjs ] && git add .pnp.loader.mjs
+
+# Abort if nothing ended up staged (e.g. dependency already current)
+if git diff --cached --quiet; then
+  echo -e "${GREEN}✓ No staged changes after updates; skipping commit.${NC}"
+  if [ "$CREATE_NEW_BRANCH" = true ]; then
+    git checkout main
+    git branch -D "$BRANCH_NAME"
+  fi
+  exit 0
+fi
+
 git commit -m "$PR_TITLE"
 
 # Push branch
 echo -e "${YELLOW}Pushing branch to GitHub...${NC}"
 git push -u origin "$BRANCH_NAME"
 
-# Create pull request using GitHub CLI
-if command -v gh &> /dev/null; then
-  echo -e "${YELLOW}Creating pull request...${NC}"
-  gh pr create \
-    --title "$PR_TITLE" \
-    --body "$PR_BODY" \
-    --base main \
-    --head "$BRANCH_NAME"
-  
-  echo -e "${GREEN}✓ Pull request created successfully!${NC}"
+# Create pull request using GitHub CLI (only if we created a new branch)
+if [ "$CREATE_NEW_BRANCH" = true ]; then
+  if command -v gh &> /dev/null; then
+    if gh auth status >/dev/null 2>&1 || [ -n "${GH_TOKEN:-${GITHUB_TOKEN:-}}" ]; then
+      echo -e "${YELLOW}Creating pull request...${NC}"
+      gh pr create \
+        --title "$PR_TITLE" \
+        --body "$PR_BODY" \
+        --base main \
+        --head "$BRANCH_NAME"
+      
+      echo -e "${GREEN}✓ Pull request created successfully!${NC}"
+    else
+      echo -e "${YELLOW}Skipping PR creation - authenticate gh or export GH_TOKEN.${NC}"
+      echo -e "${YELLOW}Branch pushed: ${BRANCH_NAME}${NC}"
+    fi
+  else
+    echo -e "${RED}GitHub CLI (gh) not installed. Please create the PR manually.${NC}"
+    echo -e "${YELLOW}Branch pushed: ${BRANCH_NAME}${NC}"
+    echo ""
+    echo "PR Title: $PR_TITLE"
+    echo ""
+    echo "PR Body:"
+    echo "$PR_BODY"
+  fi
 else
-  echo -e "${RED}GitHub CLI (gh) not installed. Please create the PR manually.${NC}"
-  echo -e "${YELLOW}Branch pushed: ${BRANCH_NAME}${NC}"
-  echo ""
-  echo "PR Title: $PR_TITLE"
-  echo ""
-  echo "PR Body:"
-  echo "$PR_BODY"
+  echo -e "${GREEN}✓ Changes pushed to existing branch: ${BRANCH_NAME}${NC}"
+  echo -e "${YELLOW}The existing PR will be updated automatically.${NC}"
 fi
 
 echo -e "${GREEN}=== Package update complete! ===${NC}"

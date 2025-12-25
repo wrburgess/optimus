@@ -32,6 +32,10 @@ else
   exit 1
 fi
 
+# Disable frozen mode so Gemfile.lock can be rewritten during automation
+echo -e "${YELLOW}Ensuring bundler frozen mode is disabled...${NC}"
+bundle config set --local frozen false
+
 # Update bundler to latest version
 echo -e "${YELLOW}Updating bundler to latest version...${NC}"
 gem install bundler --no-document
@@ -112,7 +116,7 @@ end
 File.write(path, updated_content)
 RUBY
       
-      UPDATED_GEMS+=("${GEM_NAME}: updated to ${NEWEST_VERSION}")
+      UPDATED_GEMS+=("${GEM_NAME_VALUE}: updated to ${NEWEST_VERSION}")
     else
       echo -e "${YELLOW}  → ${GEM_NAME} has no version constraint, skipping Gemfile update${NC}"
       UPDATED_GEMS+=("${GEM_NAME}: no version constraint in Gemfile")
@@ -187,11 +191,12 @@ $(git diff Gemfile.lock)
 
 </details>
 
----
-*Generated automatically by \`bin/update-gems\`*"
+*Generated automatically by \`bin/update-gems-gha\`*"
 
 # Commit changes
 echo -e "${YELLOW}Committing changes...${NC}"
+git config user.name "github-actions[bot]"
+git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git add Gemfile Gemfile.lock
 git commit -m "$PR_TITLE"
 
@@ -202,14 +207,19 @@ git push -u origin "$BRANCH_NAME"
 # Create pull request using GitHub CLI (only if we created a new branch)
 if [ "$CREATE_NEW_BRANCH" = true ]; then
   if command -v gh &> /dev/null; then
-    echo -e "${YELLOW}Creating pull request...${NC}"
-    gh pr create \
-      --title "$PR_TITLE" \
-      --body "$PR_BODY" \
-      --base main \
-      --head "$BRANCH_NAME"
-    
-    echo -e "${GREEN}✓ Pull request created successfully!${NC}"
+    if gh auth status >/dev/null 2>&1 || [ -n "${GH_TOKEN:-${GITHUB_TOKEN:-}}" ]; then
+      echo -e "${YELLOW}Creating pull request...${NC}"
+      gh pr create \
+        --title "$PR_TITLE" \
+        --body "$PR_BODY" \
+        --base main \
+        --head "$BRANCH_NAME"
+      
+      echo -e "${GREEN}✓ Pull request created successfully!${NC}"
+    else
+      echo -e "${YELLOW}Skipping PR creation - authenticate gh or export GH_TOKEN.${NC}"
+      echo -e "${YELLOW}Branch pushed: ${BRANCH_NAME}${NC}"
+    fi
   else
     echo -e "${RED}GitHub CLI (gh) not installed. Please create the PR manually.${NC}"
     echo -e "${YELLOW}Branch pushed: ${BRANCH_NAME}${NC}"

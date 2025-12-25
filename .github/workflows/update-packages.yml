@@ -28,5 +28,5 @@ jobs:
 
       - name: Run update script
         run: |
-          chmod +x bin/update-packages-gha
-          bin/update-packages-gha
+          chmod +x bin/update-packages
+          bin/update-packages

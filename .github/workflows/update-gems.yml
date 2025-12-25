@@ -22,5 +22,6 @@ jobs:
 
       - name: Run update script
         run: |
-          chmod +x bin/update-gems-gha
-          bin/update-gems-gha
+          chmod +x bin/update-gems
+          bin/update-gems
+          
