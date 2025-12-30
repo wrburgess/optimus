@@ -1,0 +1,41 @@
+<%= render Admin::HeaderForIndex::Component.new(
+  instance: @instance, 
+  controller: params[:controller], 
+  action: params[:action], 
+  collection_export_xlsx_button: true, 
+  show_filtering: true) 
+%>
+
+<%= render Admin::PageContainer::Component.new do %>
+
+  <%= render Admin::TableForIndex::Component.new(data: @instances) do |table| %>
+    <% table.with_column(sort_link([:admin, @q], :id, "ID")) { |instance| instance.id.to_s } %>
+    <% table.with_column(sort_link([:admin, @q], :user_last_name, "User", default_order: :asc)) { |instance| link_to(instance.user.full_name, admin_user_path(instance.user)) } %>
+    <% table.with_column(sort_link([:admin, @q], :operation, "Operation", default_order: :asc)) { |instance| instance.operation.upcase } %>
+    <% table.with_column(sort_link([:admin, @q], :loggable_type, "Model", default_order: :asc)) { |instance| instance.loggable_type.to_s } %>
+    <% table.with_column(sort_link([:admin, @q], :loggable_id, "Model ID", default_order: :asc)) { |instance| instance.loggable_id.to_s } %>
+    <% table.with_column("Data Record") { |instance| link_to instance.try(:loggable).try(:name), polymorphic_path([:admin, instance.try(:loggable)]) if instance.try(:loggable) } %>
+    <% table.with_column(sort_link([:admin, @q],  :created_at, "Date/Time", default_order: :asc)) { |instance| default_date_format(instance.created_at) } %>
+    <% table.with_column("Actions") do |instance| %>
+      <%= render Admin::ActionButton::Component.new(operation: :show, instance: instance, button_classes: "me-3", icon_classes: :none) %>
+    <% end %>
+  <% end %>
+
+  <%= render Admin::IndexPager::Component.new(pagy: @pagy, instance: @instance) %>
+
+  <%= render Admin::FilterCard::Component.new do %>
+    <%= simple_form_for [:admin, @q], url: polymorphic_path([:admin, @instance]), html: { method: :get }, wrapper: :floating_labels_form do |f| %>
+      <%= f.input :id_eq, label: "ID equals", placeholder: "ID equals" %>
+      <%= f.input :user_id_eq, label: "User ID equals", placeholder: "User ID equals" %>
+      <%= f.input :user_first_name_or_user_last_name_cont, label: "User name contains", placeholder: "User name contains" %>
+      <%= f.input :user_email_cont, label: "User email contains", placeholder: "User email contains" %>
+      <%= f.input :loggable_type_cont, label: "Model name contains", placeholder: "Model name contains" %>
+      <%= f.input :loggable_id_eq, label: "Model ID equals", placeholder: "Model ID equals" %>
+      <%= f.input :operation_eq, label: "Operation", include_blank: "Any", collection: SystemOperations.all %>
+
+      <%= render Admin::FormButton::Component.new(operation: :filter) %>
+      <%= render Admin::LinkButton::Component.new(text: 'Reset Form', path: request.path) %>
+    <% end %>
+  <% end %>
+
+<% end %>

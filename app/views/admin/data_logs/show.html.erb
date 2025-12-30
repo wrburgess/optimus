@@ -1,0 +1,23 @@
+<%= render Admin::HeaderForShow::Component.new(
+    instance: @instance, 
+    controller: params[:controller], 
+    action: params[:action]
+  ) 
+%>
+
+<%= render Admin::PageContainer::Component.new do %>
+  <%= render Admin::TableForShow::Component.new(title: "Data Log Details") do |table| %>
+    <% table.with_row(name: "ID", value: @instance.id) %>
+    <% table.with_row(name: "User email", value: link_to(@instance.user.email, admin_user_path(@instance.user))) %>
+    <% table.with_row(name: "User name", value: link_to(@instance.user.full_name, admin_user_path(@instance.user))) %>
+    <% table.with_row(name: "Action", value: @instance.operation.upcase) %>
+    <% table.with_row(name: "Class / Model", value:  @instance.loggable_type.to_s) %>
+    <% table.with_row(name: "Class / Model ID", value: (link_to(@instance.loggable_id, polymorphic_path([:admin, @instance.loggable])) if @instance.loggable)) %>
+    <% table.with_row(name: "Model record", value: (link_to(@instance.loggable.try(:name), polymorphic_path([:admin, @instance.loggable])) if @instance.loggable)) %>
+    <% table.with_row(name: "Note", value: @instance.note) %>
+    <% table.with_row(name: "Meta", value: (ap(JSON.parse(@instance.meta), indent: 2, plain: true).html_safe if @instance.meta)) %>
+    <% table.with_row(name: "Original", value: (ap(JSON.parse(@instance.original_data), indent: 2, plain: true).html_safe if @instance.original_data)) %>
+    <% table.with_row(name: "Updated at", value: default_date_format(@instance.updated_at)) %>
+    <% table.with_row(name: "Created at", value: default_date_format(@instance.created_at)) %>
+  <% end %>
+<% end %>

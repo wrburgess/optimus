@@ -1,0 +1,29 @@
+<% if @title %>
+  <h4 class="table-header"><%= @title %></h4>
+<% end %>
+<table class="table">
+  <thead>
+    <tr>
+      <% columns.each do |column| %>
+        <th><%= column.label %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <% @data.each do |data| %>
+      <tr>
+        <% columns.each do |column| %>
+          <% if column.header %>
+            <th>
+              <%= capture(data, &column.td_block) %>
+            </th>
+          <% else %>
+            <td>
+              <%= capture(data, &column.td_block) %>
+            </td>
+          <% end %>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

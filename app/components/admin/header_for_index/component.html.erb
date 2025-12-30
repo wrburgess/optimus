@@ -1,0 +1,20 @@
+<div class="<%= "#{@controller.gsub('/', '-')} #{@action}" %> d-flex justify-content-between align-items-center bg-custom-light-gray p-3">
+  <div>
+    <h2><%= headline %></h2>
+  </div>
+  <div class="d-flex flex-row align-items-center gap-3">
+    <%= render Admin::ActionButton::Component.new(operation: :new, instance: @instance, classes_append: "float-end me-2") if @new_button %>
+    <%= render Admin::ActionButton::Component.new(operation: :upload, instance: @instance, classes_append: "float-end me-2") if @upload_button %>
+    <%= render Admin::ActionButton::Component.new(operation: :new, instance: @instance, classes_append: "float-end me-2") if @upload_button %>
+    <%= render Admin::ActionButton::Component.new(operation: :new, instance: @instance, text: "Upload New #{@instance.class_name_title}", classes_append: "float-end me-2") if @upload_new_button %>
+    <%= render Admin::ActionButton::Component.new(operation: :upload_file, instance: @instance, classes_append: "float-end me-2") if @upload_file_button %>
+    <%= render Admin::ActionButton::Component.new(operation: :collection_export_xlsx, instance: @instance, classes_append: "float-end me-2") if @collection_export_xlsx_button %>
+    <% if @show_filtering %>
+      <div>
+        <a href="#" data-bs-toggle="offcanvas" data-bs-target="#filters" aria-controls="filters">
+          <i class="bi bi-filter-right fs-2"></i>
+        </a>
+      </div>
+    <% end %>
+  </div>
+</div>

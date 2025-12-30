@@ -12,6 +12,7 @@ gem "kamal", require: false
 gem "pg", "1.6.3"
 gem "propshaft", "1.3.1"
 gem "puma", "7.1.0"
+gem "pundit", "2.5.2"
 gem "solid_cable", "3.0.12"
 gem "solid_cache", "1.0.10"
 gem "solid_queue", "1.2.4"

@@ -1,0 +1,42 @@
+<nav class="navbar navbar-expand-lg navbar-dark <%= env_class_color %>">
+  <div class="container-fluid">
+    <%= render Admin::Brand::Component.new(brand_name: 'Harvest', environment_name: (ENV['REVIEW'] || Rails.env)) %>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav mb-2 me-2 mb-lg-0">
+          <%= link_to "Admin", admin_root_path, class: "nav-item nav-link" %>
+        </ul>
+
+        <%= render Admin::NavItem::Component.new(title: "Sites") do |nav_item| %>
+          <% nav_item.with_dropdown_item(resource: nil, name: "Production", path: production_site_url, new_window: true) %>
+          <% nav_item.with_dropdown_item(resource: nil, name: "Staging", path: staging_site_url, new_window: true) %>
+        <% end %>
+
+        <%= render Admin::NavItem::Component.new(title: "Data") do |nav_item| %>
+          <% nav_item.with_dropdown_item(resource: Organization, name: "Organizations", path: admin_organizations_path) %>
+          <% nav_item.with_dropdown_item(resource: Title, name: "Titles", path: admin_titles_path) %>
+        <% end %>
+
+        <%= render Admin::NavItem::Component.new(title: "Management") do |nav_item| %>
+          <% nav_item.with_dropdown_item(resource: DataLog, name: "Data Logs", path: admin_data_logs_path) %>
+          <% nav_item.with_dropdown_item(resource: User, name: "System Users", path: admin_users_path) %>
+        <% end %>
+
+        <%= render Admin::UserLogin::Component.new(user_signed_in: user_signed_in?) %>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,10 @@
+<ul class="<%= style[:base] %>">
+  <% if @user_signed_in %>
+    <div class="d-flex align-items-center text-decoration-none text-light ms-2">
+      (<%= current_user.full_name if current_user.present? %>)
+    </div>
+    <%= link_to "Sign out", destroy_user_session_path, method: :delete, class: "nav-item nav-link", data: { turbo: true, turbo_method: :delete } %>
+  <% else %>
+    <%= link_to "Login", new_user_session_path, class: "nav-item nav-link" %>
+  <% end %>
+</ul>

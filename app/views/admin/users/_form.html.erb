@@ -1,0 +1,20 @@
+  <%= simple_form_for([:admin, instance], local: true) do |f| %>
+    <div class="row">
+      <div class="col-12 col-lg-6">
+        <% unless instance.new_record? %>
+          <%= f.input :id, readonly: true, wrapper: :floating_label_form %>
+        <% end %>
+        <%= f.input :first_name, as: :string, wrapper: :floating_label_form %>
+        <%= f.input :last_name, as: :string, wrapper: :floating_label_form %>
+        <%= f.input :email, as: :string, wrapper: :floating_label_form %>
+        <%= f.input :notes, as: :text, wrapper: :floating_label_form %>
+        <%= f.input :archived_at, as: :string, input_html: { value: instance.archived_at&.strftime('%Y-%m-%d') }, wrapper: :datepicker %>
+      </div>
+    </div><!-- row -->
+    <div class="row">
+      <div class="form-group">
+        <%= render Admin::ActionButton::Component.new(operation: :cancel_to_show, instance: instance, classes_append: "me-3", public: true) %>
+        <%= render Admin::FormButton::Component.new(operation: :submit) %>
+      </div>
+    </div><!-- row -->
+  <% end %>

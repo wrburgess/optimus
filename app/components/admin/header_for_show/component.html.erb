@@ -1,0 +1,15 @@
+<div class="<%= "#{@controller.gsub('/', '-')} #{@action}" %> d-flex justify-content-between align-items-center bg-custom-light-gray p-3">
+  <h2>
+    <%= link_to(link_text, polymorphic_path([:admin, @instance.class])) %>&nbsp;>
+    <%= headline %>
+    <%= render Admin::ArchivedBadge::Component.new(archived_at: @instance.try(:archived_at)) %>
+  </h2>
+  <div>
+    <%= render Admin::ActionButton::Component.new(operation: :destroy, instance: @instance, classes_append: "float-end me-2") if @delete_button %>
+    <%= render Admin::ActionButton::Component.new(operation: :archive, instance: @instance, classes_append: "float-end me-2") if @archive_button && !@instance.archived? %>
+    <%= render Admin::ActionButton::Component.new(operation: :unarchive, instance: @instance, classes_append: "float-end me-2") if @archive_button && @instance.archived? %>
+    <%= render Admin::ActionButton::Component.new(operation: :edit, instance: @instance, classes_append: "float-end me-2") if @edit_button %>
+    <%= render Admin::ActionButton::Component.new(operation: :copy, instance: @instance, classes_append: "float-end me-2") if @copy_button %>
+    <%= render Admin::ActionButton::Component.new(operation: :download, instance: @instance, classes_append: "float-end me-2") if @download_show_button %>
+  </div>
+</div>

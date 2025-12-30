@@ -1,0 +1,18 @@
+<%= render Admin::HeaderForShow::Component.new(instance: @instance, controller: params[:controller], action: params[:action], edit_button: true, delete_button: true, copy_button: true) %>
+
+<%= render Admin::PageContainer::Component.new do %>
+  <%= render Admin::TableForShow::Component.new(title: 'User Data') do |table| %>
+    <% table.with_row(name: "ID", value: @instance.id) %>
+    <% table.with_row(name: "First Name", value: @instance.first_name) %>
+    <% table.with_row(name: "Last Name", value: @instance.last_name) %>
+    <% table.with_row(name: "Email", value: mail_to(@instance.email)) %>
+    <% table.with_row(name: "Archived at", value: default_date_format(@instance.archived_at)) %>
+    <% table.with_row(name: "Created at", value: default_date_format(@instance.created_at)) %>
+    <% table.with_row(name: "Updated at", value: default_date_format(@instance.updated_at)) %>
+  <% end %> 
+  <%= render Admin::TableForShow::Component.new(title: 'Admin') do |table| %>
+    <% if policy([:admin, User]).trigger_password_reset_email? %>
+      <% table.with_row(name: "Password Reset", value: link_to("Send Password Reset Email", trigger_password_reset_email_admin_user_path(@instance), method: :put, data: { turbo: true, turbo_method: :put })) %>
+    <% end %> 
+  <% end %>
+<% end %>

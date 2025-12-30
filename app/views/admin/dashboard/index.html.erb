@@ -1,0 +1,72 @@
+<%= render Admin::DashboardHeader::Component.new(title: "Dashboard") %>
+
+<%= render Admin::DashboardContainer::Component.new do |container| %>
+  <div class="row my-3">
+    <div class="col-6">
+      <%= render Admin::DashboardCard::Component.new(title: "Media") do |card| %>
+        <% card.with_link(name: "Organizations", url: admin_organizations_path, policy: Organization) %>
+        <% card.with_link(name: "External Applications", url: admin_external_applications_path, policy: ExternalApplication) %>
+      <% end %>
+    </div>
+
+    <div class="col-6">
+      <%= render Admin::DashboardCard::Component.new(title: "Management") do |card| %>
+        <% card.with_link(name: "Data Logs", url: polymorphic_path([:admin, DataLog]), policy: DataLog) %>
+        <% card.with_link(name: "Inbound Request Logs", url: polymorphic_path([:admin, InboundRequestLog]), policy: InboundRequestLog) %>
+        <% card.with_link(name: "Reports", url: polymorphic_path([:admin, Report]), policy: Report) %>
+        <% card.with_link(name: "System Groups", url: polymorphic_path([:admin, SystemGroup]), policy: SystemGroup) %>
+        <% card.with_link(name: "System Permissions", url: polymorphic_path([:admin, SystemPermission]), policy: SystemPermission) %>
+        <% card.with_link(name: "System Roles", url: polymorphic_path([:admin, SystemRole]), policy: SystemRole) %>
+        <% card.with_link(name: "System Users", url: polymorphic_path([:admin, User]), policy: User) %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-6">
+      <%= render Admin::DashboardCard::Component.new(title: "Development") do |card| %>
+        <% card.with_link(name: "Blazer", url: admin_blazer_path, new_window: true) %>
+        <% card.with_link(name: "Cloudflare Turnstile", url: 'https://developers.cloudflare.com/turnstile/', new_window: true) %>
+        <% card.with_link(name: "GitHub", url: 'https://github.com/mpimedia/harvest/projects', new_window: true) %>
+        <% card.with_link(name: "GoodJob Dashboard", url: admin_good_job_path, new_window: true) %>
+        <% card.with_link(name: "Harvest (Production)", url: 'https://harvest.mpimediagroup.com', new_window: true) %>
+        <% card.with_link(name: "Harvest (Staging)", url: 'https://harvest-staging.mpimediagroup.com', new_window: true) %>
+        <% card.with_link(name: "Heroku Datastores", url: 'https://data.heroku.com', new_window: true) %>
+        <% card.with_link(name: "Heroku Pipeline", url: 'https://dashboard.heroku.com/pipelines/af2038da-a8c8-4dfd-966d-dd4c9489ed5c', new_window: true) %>
+        <% card.with_link(name: "Honeybadger (Staging)", url: 'https://app.honeybadger.io/projects/129221/install/rails', new_window: true) %>
+        <% card.with_link(name: "Maintenance Tasks", url: admin_maintenance_tasks_path, new_window: true) %>
+        <% card.with_link(name: "PG Hero", url: admin_pg_hero_path, new_window: true) %>
+        <% card.with_link(name: "Papertrail (Staging)", url: 'https://my.papertrailapp.com/systems/harvest-staging/events', new_window: true) %>
+        <% card.with_link(name: "Postmark", url: 'https://account.postmarkapp.com/servers', new_window: true) %>
+        <% card.with_link(name: "Rails DB", url: rails_db_path, new_window: true) if Rails.env.development? || Rails.env.staging? %>
+        <% card.with_link(name: "UptimeRobot: Staging", url: "https://dashboard.uptimerobot.com/monitors/798151118", new_window: true) %>
+      <% end %>
+    </div>
+
+    <div class="col-6">
+      <%= render Admin::DashboardCard::Component.new(title: "Tool Refs") do |card| %>
+        <% card.with_link(name: "Blazer", url: 'https://github.com/ankane/blazer', new_window: true) %>
+        <% card.with_link(name: "Bootstrap", url: 'https://getbootstrap.com/', new_window: true) %>
+        <% card.with_link(name: "Devise", url: 'https://github.com/heartcombo/devise', new_window: true) %>
+        <% card.with_link(name: "GoodJob", url: 'https://github.com/bensheldon/good_job', new_window: true) %>
+        <% card.with_link(name: "Lookbook", url: 'https://lookbook.build/', new_window: true) %>
+        <% card.with_link(name: "Node", url: 'https://nodejs.org/en', new_window: true) %>
+        <% card.with_link(name: "PG Hero", url: 'https://github.com/ankane/pghero', new_window: true) %>
+        <% card.with_link(name: "PostgreSQL", url: 'https://www.postgresql.org/', new_window: true) %>
+        <% card.with_link(name: "Pretender", url: 'https://github.com/ankane/pretender', new_window: true) %>
+        <% card.with_link(name: "Puma", url: 'https://puma.io/', new_window: true) %>
+        <% card.with_link(name: "Pundit", url: 'https://github.com/varvet/pundit', new_window: true) %>
+        <% card.with_link(name: "Ransack", url: 'https://activerecord-hackery.github.io/ransack/', new_window: true) %>
+        <% card.with_link(name: "Rspec", url: 'https://rspec.info/', new_window: true) %>
+        <% card.with_link(name: "Ruby on Rails", url: 'https://rubyonrails.org/', new_window: true) %>
+        <% card.with_link(name: "Ruby", url: 'https://www.ruby-lang.org/en/', new_window: true) %>
+        <% card.with_link(name: "Simple Form", url: 'https://github.com/heartcombo/simple_form', new_window: true) %>
+        <% card.with_link(name: "Stripe", url: 'https://docs.stripe.com/api?lang=ruby', new_window: true) %>
+        <% card.with_link(name: "Tailwind", url: "https://tailwindcss.com/", new_window: true) %>
+        <% card.with_link(name: "Tom Select", url: "https://tom-select.js.org/", new_window: true) %>
+        <% card.with_link(name: "ViewComponent", url: 'https://viewcomponent.org/', new_window: true) %>
+        <% card.with_link(name: "Yarn", url: 'https://yarnpkg.com/', new_window: true) %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

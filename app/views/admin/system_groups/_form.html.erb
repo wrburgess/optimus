@@ -1,0 +1,27 @@
+  <%= simple_form_for([:admin, instance], local: true) do |f| %>
+    <div class="row">
+      <div class="col-12 col-lg-6">
+        <% unless instance.new_record? %>
+          <%= f.input :id, readonly: true, wrapper: :floating_label_form %>
+        <% end %>
+        <%= f.input :name, wrapper: :floating_label_form %>
+        <%= f.input :abbreviation, wrapper: :floating_label_form %>
+        <%= f.input :description, wrapper: :floating_label_form %>
+        <%= f.input :notes, as: :text, wrapper: :floating_label_form %>
+        <%= f.input :system_role_ids,
+            as: :tom_select,
+            collection: SystemRole.options_for_select,
+            label: 'System Roles',
+            prompt: 'Select roles...',
+            autocomplete: 'off',
+            multiple: true,
+            wrapper: :tom_select_label_inset %>
+      </div>
+    </div><!-- row -->
+    <div class="row">
+      <div class="form-group">
+        <%= render Admin::ActionButton::Component.new(operation: :cancel_to_show, instance: instance, classes_append: "me-3", public: true) %>
+        <%= render Admin::FormButton::Component.new(operation: :submit) %>
+      </div>
+    </div><!-- row -->
+  <% end %>

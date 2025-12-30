@@ -1,0 +1,39 @@
+<%= render Admin::HeaderForShow::Component.new(
+    instance: @instance, 
+    controller: params[:controller], 
+    action: params[:action], 
+    edit_button: true, 
+    delete_button: true, 
+    copy_button: true
+  )
+%>
+
+<%= render Admin::PageContainer::Component.new do %>
+  <%= render Admin::TableForShow::Component.new(title: 'Link Data') do |table| %>
+    <% table.with_row(name: "ID", value: @instance.id) %>
+    <% table.with_row(name: "Name", value: @instance.name) %>
+    <% table.with_row(name: "Abbreviation", value: @instance.abbreviation) %>
+    <% table.with_row(name: "Description", value: @instance.description) %>
+    <% table.with_row(name: "Notes", value: @instance.notes) %>
+    <% table.with_row(name: "Created at", value: default_date_format(@instance.created_at)) %>
+    <% table.with_row(name: "Updated at", value: default_date_format(@instance.updated_at)) %>
+  <% end %>
+
+  <%= render Admin::TableForIndex::Component.new(title: 'Associated Users', data: @instance.users) do |table| %>
+    <% table.with_column("ID") { |instance| instance.id.to_s } %>
+    <% table.with_column("Name") { |instance| link_to(instance.full_name, polymorphic_path([:admin, instance])) } %>
+    <% table.with_column("Email") { |instance| mail_to(instance.email) } %>
+  <% end %>
+
+  <%= render Admin::TableForIndex::Component.new(title: 'Associated System Roles', data: @instance.system_roles) do |table| %>
+    <% table.with_column("ID") { |instance| instance.id.to_s } %>
+    <% table.with_column("Name") { |instance| link_to(instance.name, polymorphic_path([:admin, instance])) } %>
+  <% end %>
+
+  <%= render Admin::TableForIndex::Component.new(title: 'Associated System Permissions', data: @instance.system_permissions) do |table| %>
+    <% table.with_column("ID") { |instance| instance.id.to_s } %>
+    <% table.with_column("Name") { |instance| link_to(instance.name, polymorphic_path([:admin, instance])) } %>
+    <% table.with_column("Resource") { |instance| instance.resource } %>
+    <% table.with_column("Operation") { |instance| instance.operation } %>
+  <% end %>
+<% end %>

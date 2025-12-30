@@ -19,7 +19,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_30_191147) do
   create_table "account_users", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.datetime "created_at", null: false
-    t.string "role"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["account_id", "user_id"], name: "index_account_users_on_account_id_and_user_id", unique: true
@@ -28,6 +27,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_30_191147) do
   end
 
   create_table "accounts", force: :cascade do |t|
+    t.datetime "archived_at"
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.datetime "updated_at", null: false
@@ -35,6 +35,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_30_191147) do
 
   create_table "team_users", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.string "role", default: "member", null: false
     t.bigint "team_id", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false

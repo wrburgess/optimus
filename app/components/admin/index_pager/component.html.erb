@@ -1,0 +1,6 @@
+<div class="col-8">
+  <%== @pagy.series_nav(:bootstrap) %>
+</div>
+<div class="col-4">
+  <p><%== "Displaying #{@instance.class.name.pluralize} <strong>#{@pagy.from}</strong> to <strong>#{@pagy.to}</strong> of <strong>#{@pagy.count}</strong> in total" %></p>
+</div>
