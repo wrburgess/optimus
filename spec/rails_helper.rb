@@ -10,11 +10,14 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'rspec/rails'
 
 require 'capybara/rspec'
-require 'money-rails/test_helpers'
 require 'pundit/rspec'
 require 'rake'
+require 'rspec/rails'
 require 'shoulda/matchers'
+require 'vcr'
+require 'webmock/rspec'
 include RSpec::Longrun::DSL
+
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -49,6 +52,19 @@ Capybara.register_driver :selenium_with_long_timeout do |app|
 end
 
 RSpec.configure do |config|
+  config.extend ControllerMacros, type: :component
+  config.extend ControllerMacros, type: :controller
+  config.include ActiveJob::TestHelper
+  config.include ActiveSupport::Testing::TimeHelpers
+  config.include Capybara::RSpecMatchers, type: :component
+  config.include Devise::Test::ControllerHelpers, type: :component
+  config.include Devise::Test::ControllerHelpers, type: :controller
+  config.include FactoryBot::Syntax::Methods
+  config.include Rails.application.routes.url_helpers
+  config.include ViewComponent::SystemTestHelpers, type: :component
+  config.include ViewComponent::TestHelpers, type: :component
+  config.include Warden::Test::Helpers
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')
@@ -98,7 +114,11 @@ RSpec.configure do |config|
 
   # TODO: Remove below adjustment when Devise releases the fix done in
   # https://github.com/heartcombo/devise/issues/5705
-  config.before(:each, proc { |type, _metadata| %i[component request controller].include?(type) }) do
+  config.before(:each, type: :controller) do
+    Rails.application.reload_routes_unless_loaded
+  end
+
+  config.before(:each, type: :component) do
     Rails.application.reload_routes_unless_loaded
   end
 end
@@ -111,3 +131,4 @@ Shoulda::Matchers.configure do |config|
 end
 
 DatabaseCleaner.allow_remote_database_url = true
+WebMock.disable_net_connect!(allow_localhost: true)

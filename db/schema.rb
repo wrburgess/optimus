@@ -10,64 +10,45 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_30_185840) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_30_191147) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pgcrypto"
 
-  create_table "account_lockouts", force: :cascade do |t|
-    t.datetime "deadline", null: false
-    t.datetime "email_last_sent"
-    t.string "key", null: false
-  end
-
-  create_table "account_login_change_keys", force: :cascade do |t|
-    t.datetime "deadline", null: false
-    t.string "key", null: false
-    t.string "login", null: false
-  end
-
-  create_table "account_login_failures", force: :cascade do |t|
-    t.integer "number", default: 1, null: false
-  end
-
-  create_table "account_password_reset_keys", force: :cascade do |t|
-    t.datetime "deadline", null: false
-    t.datetime "email_last_sent", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.string "key", null: false
-  end
-
-  create_table "account_remember_keys", force: :cascade do |t|
-    t.datetime "deadline", null: false
-    t.string "key", null: false
-  end
-
-  create_table "account_verification_keys", force: :cascade do |t|
-    t.datetime "email_last_sent", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.string "key", null: false
-    t.datetime "requested_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-  end
-
-  create_table "account_webauthn_keys", primary_key: ["account_id", "webauthn_id"], force: :cascade do |t|
+  create_table "account_users", force: :cascade do |t|
     t.bigint "account_id", null: false
-    t.datetime "last_use", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.string "nickname"
-    t.string "public_key", null: false
-    t.integer "sign_count", null: false
-    t.string "webauthn_id", null: false
-    t.index ["account_id"], name: "index_account_webauthn_keys_on_account_id"
-  end
-
-  create_table "account_webauthn_user_ids", force: :cascade do |t|
-    t.string "webauthn_id", null: false
+    t.datetime "created_at", null: false
+    t.string "role"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["account_id", "user_id"], name: "index_account_users_on_account_id_and_user_id", unique: true
+    t.index ["account_id"], name: "index_account_users_on_account_id"
+    t.index ["user_id"], name: "index_account_users_on_user_id"
   end
 
   create_table "accounts", force: :cascade do |t|
-    t.citext "email", null: false
-    t.string "password_hash"
-    t.integer "status", default: 1, null: false
-    t.index ["email"], name: "index_accounts_on_email", unique: true, where: "(status = ANY (ARRAY[1, 2]))"
-    t.check_constraint "email ~ '^[^,;@ \r\n]+@[^,@; \r\n]+.[^,@; \r\n]+$'::citext", name: "valid_email"
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "team_users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "team_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["team_id", "user_id"], name: "index_team_users_on_team_id_and_user_id", unique: true
+    t.index ["team_id"], name: "index_team_users_on_team_id"
+    t.index ["user_id"], name: "index_team_users_on_user_id"
+  end
+
+  create_table "teams", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_teams_on_account_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -96,12 +77,9 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_30_185840) do
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
   end
 
-  add_foreign_key "account_lockouts", "accounts", column: "id"
-  add_foreign_key "account_login_change_keys", "accounts", column: "id"
-  add_foreign_key "account_login_failures", "accounts", column: "id"
-  add_foreign_key "account_password_reset_keys", "accounts", column: "id"
-  add_foreign_key "account_remember_keys", "accounts", column: "id"
-  add_foreign_key "account_verification_keys", "accounts", column: "id"
-  add_foreign_key "account_webauthn_keys", "accounts"
-  add_foreign_key "account_webauthn_user_ids", "accounts", column: "id"
+  add_foreign_key "account_users", "accounts"
+  add_foreign_key "account_users", "users"
+  add_foreign_key "team_users", "teams"
+  add_foreign_key "team_users", "users"
+  add_foreign_key "teams", "accounts"
 end
