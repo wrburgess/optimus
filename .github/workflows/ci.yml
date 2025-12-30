@@ -106,14 +106,6 @@ jobs:
         uses: marocchino/tool-versions-action@v1
         id: versions
 
-      - name: Install elasticsearch
-        uses: ankane/setup-elasticsearch@v1
-        with:
-          elasticsearch-version: ${{ steps.versions.outputs.elasticsearch }}
-
-      - name: Install libvips42 package
-        run: sudo apt-get update && sudo apt-get install libvips42
-
       - name: Install ruby
         uses: ruby/setup-ruby@v1
         with:
