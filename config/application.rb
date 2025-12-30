@@ -1,6 +1,18 @@
 require_relative "boot"
 
-require "rails/all"
+require "rails"
+# Pick the frameworks you want:
+require "action_text/engine"
+require "active_storage/engine"
+# require "rails/test_unit/railtie"
+require "action_cable/engine"
+require "action_mailbox/engine"
+require "action_controller/railtie"
+require "action_mailer/railtie"
+require "action_view/railtie"
+require "active_job/railtie"
+require "active_model/railtie"
+require "active_record/railtie"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -23,6 +35,5 @@ module Optimus
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
-    config.active_record.primary_key = :uuid
   end
 end
