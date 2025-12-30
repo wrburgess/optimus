@@ -9,7 +9,7 @@ class Admin::UserLogin::Component < ApplicationComponent
 
   def style
     {
-      base: 'navbar-nav mb-2 mb-lg-0'
+      base: "navbar-nav mb-2 mb-lg-0"
     }
   end
 end

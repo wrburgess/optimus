@@ -31,11 +31,11 @@ class SystemRole < ApplicationRecord
   end
 
   def self.options_for_select
-    select_order.map { |instance| [instance.name, instance.id] }
+    select_order.map { |instance| [ instance.name, instance.id ] }
   end
 
   def self.default_sort
-    [name: :asc, created_at: :desc]
+    [ name: :asc, created_at: :desc ]
   end
 
   def update_associations(params)

@@ -23,6 +23,6 @@ class DataLog < ApplicationRecord
   end
 
   def self.default_sort
-    ['created_at desc', 'updated_at desc']
+    [ "created_at desc", "updated_at desc" ]
   end
 end

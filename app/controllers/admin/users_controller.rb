@@ -6,7 +6,7 @@ class Admin::UsersController < AdminController
   def index
     authorize(controller_class)
     @q = controller_class.actives.ransack(params[:q])
-    @q.sorts = ['last_name asc', 'created_at desc'] if @q.sorts.empty?
+    @q.sorts = [ "last_name asc", "created_at desc" ] if @q.sorts.empty?
 
     @pagy, @instances = pagy(@q.result)
     @instance = controller_class.new
@@ -32,7 +32,7 @@ class Admin::UsersController < AdminController
 
     instance.log(user: current_user, operation: action_name, meta: params.to_json)
     flash[:success] = "New #{instance.class_name_title} successfully created"
-    redirect_to polymorphic_path([:admin, instance])
+    redirect_to polymorphic_path([ :admin, instance ])
   end
 
   def edit
@@ -49,7 +49,7 @@ class Admin::UsersController < AdminController
 
     instance.log(user: current_user, operation: action_name, meta: params.to_json, original_data: original_instance.attributes.to_json)
     flash[:success] = "#{instance.class_name_title} successfully updated"
-    redirect_to polymorphic_path([:admin, instance])
+    redirect_to polymorphic_path([ :admin, instance ])
   end
 
   def destroy
@@ -59,7 +59,7 @@ class Admin::UsersController < AdminController
 
     instance.log(user: current_user, operation: action_name)
     flash[:danger] = "#{instance.class_name_title} successfully deleted"
-    redirect_to polymorphic_path([:admin, controller_class])
+    redirect_to polymorphic_path([ :admin, controller_class ])
   end
 
   def collection_export_xlsx
@@ -85,12 +85,12 @@ class Admin::UsersController < AdminController
 
     send_data(
       render_to_string(
-        template: 'admin/xlsx/reports',
-        formats: [:xlsx],
-        handlers: [:axlsx],
+        template: "admin/xlsx/reports",
+        formats: [ :xlsx ],
+        handlers: [ :axlsx ],
         layout: false
       ),
-      filename: helpers.file_name_with_timestamp(file_name: file_name, file_extension: 'xlsx'),
+      filename: helpers.file_name_with_timestamp(file_name: file_name, file_extension: "xlsx"),
       type: Mime[:xlsx]
     )
   end

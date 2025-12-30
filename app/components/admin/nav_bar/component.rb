@@ -7,12 +7,12 @@ class Admin::NavBar::Component < ApplicationComponent
 
   def env_class_color
     case @environment
-    when 'development'
-      'bg-primary'
-    when 'staging'
-      'bg-danger'
+    when "development"
+      "bg-primary"
+    when "staging"
+      "bg-danger"
     else
-      'bg-secondary'
+      "bg-secondary"
     end
   end
 end

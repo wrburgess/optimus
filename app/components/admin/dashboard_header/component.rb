@@ -1,7 +1,7 @@
 class Admin::DashboardHeader::Component < ApplicationComponent
   renders_many :breadcrumbs, ->(name:, url:) { content_tag(:a, name, href: url) }
   renders_many :links, Admin::DashboardHeaderLink::Component
-  renders_many :page_links, ->(name:, url:, options: {}) { link_to(name, url, class: 'btn btn-primary', **options) }
+  renders_many :page_links, ->(name:, url:, options: {}) { link_to(name, url, class: "btn btn-primary", **options) }
 
   def initialize(title:, breadcrumbs: [], **kwargs)
     @title = title

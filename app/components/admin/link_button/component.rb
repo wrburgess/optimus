@@ -1,5 +1,5 @@
 class Admin::LinkButton::Component < ApplicationComponent
-  def initialize(path:, text: nil, button_classes: 'btn btn-light', public: true)
+  def initialize(path:, text: nil, button_classes: "btn btn-light", public: true)
     @button_classes = button_classes
     @path = path
     @public = public

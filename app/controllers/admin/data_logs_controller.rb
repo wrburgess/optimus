@@ -38,12 +38,12 @@ class Admin::DataLogsController < AdminController
 
     send_data(
       render_to_string(
-        template: 'admin/xlsx/reports',
-        formats: [:xlsx],
-        handlers: [:axlsx],
+        template: "admin/xlsx/reports",
+        formats: [ :xlsx ],
+        handlers: [ :axlsx ],
         layout: false
       ),
-      filename: helpers.file_name_with_timestamp(file_name: file_name, file_extension: 'xlsx'),
+      filename: helpers.file_name_with_timestamp(file_name: file_name, file_extension: "xlsx"),
       type: Mime[:xlsx]
     )
   end

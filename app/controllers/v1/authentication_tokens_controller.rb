@@ -1,5 +1,5 @@
 class Api::V1::AuthenticationTokensController < ApiController
-  skip_before_action :authorize_request, only: [:create]
+  skip_before_action :authorize_request, only: [ :create ]
 
   def create
     external_application = ExternalApplication.find_by(api_key: params[:api_key])
@@ -18,7 +18,7 @@ class Api::V1::AuthenticationTokensController < ApiController
         application_name: external_application.name
       }, status: :ok
     else
-      render json: { error: 'unauthorized' }, status: :unauthorized
+      render json: { error: "unauthorized" }, status: :unauthorized
     end
   end
 end

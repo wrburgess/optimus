@@ -1,18 +1,18 @@
 class Admin::DashboardHeaderLink::Component < ApplicationComponent
   DEFAULT_BUTTON_CLASSES = {
-    new: 'btn btn-success',
-    edit: 'btn btn-secondary',
-    archive: 'btn btn-warning',
-    unarchive: 'btn btn-warning',
-    download: 'btn btn-info'
+    new: "btn btn-success",
+    edit: "btn btn-secondary",
+    archive: "btn btn-warning",
+    unarchive: "btn btn-warning",
+    download: "btn btn-info"
   }.freeze
 
   DEFAULT_ICON_CLASSES = {
-    new: 'bi bi-plus-circle',
-    edit: 'bi bi-pencil',
-    archive: 'bi bi-archive',
-    unarchive: 'bi bi-arrow-counterclockwise',
-    download: 'bi bi-file-spreadsheet'
+    new: "bi bi-plus-circle",
+    edit: "bi bi-pencil",
+    archive: "bi bi-archive",
+    unarchive: "bi bi-arrow-counterclockwise",
+    download: "bi bi-file-spreadsheet"
   }.freeze
 
   def initialize(instance:, type:, **options)
@@ -44,16 +44,16 @@ class Admin::DashboardHeaderLink::Component < ApplicationComponent
 
   def link_classes
     default_classes = @options[:default_classes] || DEFAULT_BUTTON_CLASSES[@type]
-    [default_classes, @options[:additional_classes]].join(' ')
+    [ default_classes, @options[:additional_classes] ].join(" ")
   end
 
   def additional_options
     options = @options[:additional_options] || {}
 
     if @type == :archive
-      options.merge!(method: :delete, data: { confirm: 'Are you sure you want to archive this record?' })
+      options.merge!(method: :delete, data: { confirm: "Are you sure you want to archive this record?" })
     elsif @type == :unarchive
-      options.merge!(method: :patch, data: { confirm: 'Are you sure you want to unarchive this record?' })
+      options.merge!(method: :patch, data: { confirm: "Are you sure you want to unarchive this record?" })
     end
 
     options
@@ -62,15 +62,15 @@ class Admin::DashboardHeaderLink::Component < ApplicationComponent
   def path
     case @type
     when :new
-      new_polymorphic_path([:admin, @instance])
+      new_polymorphic_path([ :admin, @instance ])
     when :edit
-      edit_polymorphic_path([:admin, @instance])
+      edit_polymorphic_path([ :admin, @instance ])
     when :unarchive
-      polymorphic_path([:admin, @instance], action: :unarchive)
+      polymorphic_path([ :admin, @instance ], action: :unarchive)
     when :download
-      polymorphic_path([:admin, @instance], action: :export_xlsx)
+      polymorphic_path([ :admin, @instance ], action: :export_xlsx)
     else
-      polymorphic_path([:admin, @instance])
+      polymorphic_path([ :admin, @instance ])
     end
   end
 

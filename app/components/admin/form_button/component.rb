@@ -12,38 +12,38 @@ class Admin::FormButton::Component < ApplicationComponent
     return @text if @text.present?
 
     texts = {
-      filter: 'Filter',
-      submit: 'Submit'
+      filter: "Filter",
+      submit: "Submit"
     }
 
-    texts[@operation] || 'Submit'
+    texts[@operation] || "Submit"
   end
 
   def button_class_list
     return "#{@button_classes} #{@classes_append}" if @button_classes.present? && @classes_append.present?
     return @button_classes if @button_classes.present?
-    return '' if @button_classes == :none
+    return "" if @button_classes == :none
 
     classes = {
-      filter: 'btn btn-secondary',
-      submit: 'btn btn-success'
+      filter: "btn btn-secondary",
+      submit: "btn btn-success"
     }
 
-    base_class = classes[@operation] || 'btn btn-success'
+    base_class = classes[@operation] || "btn btn-success"
     base_class += " #{@classes_append}" if @classes_append.present?
     base_class
   end
 
   def icon_class_list
     return @icon_classes if @icon_classes.present?
-    return '' if @icon_classes == :none
+    return "" if @icon_classes == :none
 
     classes = {
-      filter: 'bi bi-funnel',
-      submit: 'bi bi-check-circle'
+      filter: "bi bi-funnel",
+      submit: "bi bi-check-circle"
     }
 
-    classes[@operation] || 'bi bi-check-circle'
+    classes[@operation] || "bi bi-check-circle"
   end
 
   def render?

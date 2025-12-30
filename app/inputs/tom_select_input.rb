@@ -1,9 +1,9 @@
 class TomSelectInput < SimpleForm::Inputs::Base
   def input(wrapper_options = nil)
     merged_input_options = merge_wrapper_options(input_html_options, wrapper_options)
-    autocomplete = options[:autocomplete] || 'off'
+    autocomplete = options[:autocomplete] || "off"
     multiple = options[:multiple] || false
-    prompt = options[:prompt] || 'Select...'
+    prompt = options[:prompt] || "Select..."
 
     @builder.select(
       attribute_name,
@@ -12,8 +12,8 @@ class TomSelectInput < SimpleForm::Inputs::Base
       {
         multiple:,
         autocomplete:,
-        class: 'tom-select',
-        data: { tom_select_target: 'tomselect' }
+        class: "tom-select",
+        data: { tom_select_target: "tomselect" }
       }.merge(merged_input_options)
     )
   end

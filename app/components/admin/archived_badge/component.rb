@@ -9,7 +9,7 @@ class Admin::ArchivedBadge::Component < ApplicationComponent
 
   def style
     {
-      base: 'badge bg-warning ms-1'
+      base: "badge bg-warning ms-1"
     }
   end
 end

@@ -5,8 +5,8 @@ class ApiController < ApplicationController
   private
 
   def authorize_request
-    header = request.headers['Authorization']
-    header = header.split(' ').last if header
+    header = request.headers["Authorization"]
+    header = header.split(" ").last if header
     decoded = JsonWebTokenService.decode(header)
     @current_application = ExternalApplication.find(decoded[:application_id])
   rescue ActiveRecord::RecordNotFound => e

@@ -1,5 +1,5 @@
 class Admin::NavDropdownItem::Component < ApplicationComponent
-  def initialize(name:, path:, resource: nil, operation: 'index', new_window: false)
+  def initialize(name:, path:, resource: nil, operation: "index", new_window: false)
     @name = name
     @path = path
     @resource = resource
@@ -10,6 +10,6 @@ class Admin::NavDropdownItem::Component < ApplicationComponent
   def render?
     return true if @resource.nil?
 
-    Pundit.policy(current_user, [:admin, @resource]).send("#{@operation}?")
+    Pundit.policy(current_user, [ :admin, @resource ]).send("#{@operation}?")
   end
 end
