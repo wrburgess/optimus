@@ -2,6 +2,8 @@ class User < ApplicationRecord
   include Archivable
   include Loggable
 
+  validates :email, presence: true, uniqueness: true
+
   devise(
     :confirmable,
     :database_authenticatable,
@@ -64,9 +66,10 @@ class User < ApplicationRecord
 
   def last_name_first_name
     return "#{last_name}, #{first_name}".titleize.strip if last_name.present? && first_name.present?
-    return last_name.titleize.strip if first_name.blank?
+    return last_name.to_s.titleize.strip if last_name.present?
+    return first_name.to_s.titleize.strip if first_name.present?
 
-    first_name.titleize.strip if last_name.blank?
+    nil
   end
 
   def full_name_and_email
