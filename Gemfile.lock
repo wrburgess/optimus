@@ -127,6 +127,8 @@ GEM
     crass (1.0.6)
     css_parser (1.21.1)
       addressable
+    cssbundling-rails (1.4.3)
+      railties (>= 6.0.0)
     csv (3.3.5)
     database_cleaner-active_record (2.2.2)
       activerecord (>= 5.a)
@@ -590,6 +592,7 @@ DEPENDENCIES
   bundler-audit (= 0.9.3)
   capybara (= 3.40.0)
   caxlsx_rails (= 0.6.4)
+  cssbundling-rails (= 1.4.3)
   csv (= 3.3.5)
   database_cleaner-active_record (= 2.2.2)
   debug (= 1.11.1)
@@ -680,6 +683,7 @@ CHECKSUMS
   crack (1.0.1) sha256=ff4a10390cd31d66440b7524eb1841874db86201d5b70032028553130b6d4c7e
   crass (1.0.6) sha256=dc516022a56e7b3b156099abc81b6d2b08ea1ed12676ac7a5657617f012bd45d
   css_parser (1.21.1) sha256=6cfd3ffc0a97333b39d2b1b49c95397b05e0e3b684d68f77ec471ba4ec2ef7c7
+  cssbundling-rails (1.4.3) sha256=53aecd5a7d24ac9c8fcd92975acd0e830fead4ee4583d3d3d49bb64651946e41
   csv (3.3.5) sha256=6e5134ac3383ef728b7f02725d9872934f523cb40b961479f69cf3afa6c8e73f
   database_cleaner-active_record (2.2.2) sha256=88296b9f3088c31f7c0d4fcec10f68e4b71c96698043916de59b04debec10388
   database_cleaner-core (2.0.1) sha256=8646574c32162e59ed7b5258a97a208d3c44551b854e510994f24683865d846c

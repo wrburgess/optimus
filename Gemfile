@@ -10,6 +10,7 @@ gem "awesome_print", "1.9.2"
 gem "blazer", "3.3.0"
 gem "bootsnap", "1.20.1", require: false
 gem "caxlsx_rails", "0.6.4"
+gem "cssbundling-rails", "1.4.3"
 gem "csv", "3.3.5"
 gem "devise", "4.9.4"
 gem "foreman", "0.90.0"
