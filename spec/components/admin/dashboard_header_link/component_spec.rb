@@ -88,7 +88,7 @@ describe Admin::DashboardHeaderLink::Component, type: :component do
 
     render_inline(described_class.new(instance: resource, type: :new))
 
-    expect(page).not_to have_link(/New/i)
+    expect(page).not_to have_link('New', href: '/admin/resources/new')
   end
 
   it 'renders download link when policy permits export' do

@@ -1,11 +1,9 @@
 require 'rails_helper'
 
 describe Admin::UserLogin::Component, type: :component do
-  include_context 'component_setup'
+  let(:user) { create(:user) }
 
-  before do
-    sign_in(user)
-  end
+  before { sign_in(user) }
 
   it 'renders a support and Sign Out link if user signed in' do
     component = described_class.new(user_signed_in: true)

@@ -1,14 +1,11 @@
 require 'rails_helper'
 
 describe Admin::NavBar::Component, type: :component do
-  include_context 'component_setup'
-
+  let(:user) { create(:user) }
   let(:environment) { 'development' }
-  let(:component) { described_class.new(environment: environment) }
+  let(:component) { described_class.new(environment:) }
 
-  before do
-    sign_in(user)
-  end
+  before { sign_in(user) }
 
   describe '#env_class_color' do
     subject { component.env_class_color }

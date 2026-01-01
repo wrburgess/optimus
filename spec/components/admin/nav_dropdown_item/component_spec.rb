@@ -1,11 +1,9 @@
 require 'rails_helper'
 
 describe Admin::NavDropdownItem::Component, type: :component do
-  include_context 'component_setup'
+  let(:user) { create(:user) }
 
-  before do
-    sign_in(user)
-  end
+  before { sign_in(user) }
 
   it 'renders a nav item dropdown item if the resource index policy allows it for the current user' do
     allow(Pundit).to receive(:policy).and_return(double('policy', index?: true))
