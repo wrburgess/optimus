@@ -26,7 +26,7 @@ describe Admin::DashboardHeader::Component, type: :component do
   end
 
   it 'shows the filter indicator when query has conditions' do
-    q = double('ransack', conditions: [ double ], archived_at_not_null: true )
+    q = double('ransack', conditions: [ double ], archived_at_not_null: true)
 
     render_inline(described_class.new(title: 'Dashboard', q:, show_filtering: false))
 
