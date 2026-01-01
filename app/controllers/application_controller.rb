@@ -9,6 +9,22 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
+  def controller_class
+    controller_name.classify.constantize
+  end
+
+  def controller_class_plural
+    controller_name.underscore.pluralize
+  end
+
+  def controller_class_singular
+    controller_name.underscore.singularize
+  end
+
+  def controller_class_symbolized
+    controller_name.underscore.singularize.to_sym
+  end
+
   private
 
   def user_not_authorized

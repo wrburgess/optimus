@@ -2,9 +2,9 @@ class Admin::DataLogsController < AdminController
   include Pagy::Method
 
   before_action :authenticate_user!
+  before_action :authorize_user
 
   def index
-    authorize(controller_class)
     @q = controller_class.ransack(params[:q])
     @q.sorts = controller_class.default_sort if @q.sorts.empty?
     @pagy, @instances = pagy(@q.result)
@@ -12,13 +12,10 @@ class Admin::DataLogsController < AdminController
   end
 
   def show
-    authorize(controller_class)
     @instance = controller_class.find(params[:id])
   end
 
   def collection_export_xlsx
-    authorize(controller_class)
-
     sql = %(
       SELECT
         data_logs.id,
@@ -46,5 +43,11 @@ class Admin::DataLogsController < AdminController
       filename: helpers.file_name_with_timestamp(file_name: file_name, file_extension: "xlsx"),
       type: Mime[:xlsx]
     )
+  end
+
+  private
+
+  def authorize_user
+    authorize([ :admin, controller_class ])
   end
 end

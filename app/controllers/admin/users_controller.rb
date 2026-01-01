@@ -2,9 +2,9 @@ class Admin::UsersController < AdminController
   include Pagy::Method
 
   before_action :authenticate_user!
+  before_action :authorize_user
 
   def index
-    authorize(controller_class)
     @q = controller_class.actives.ransack(params[:q])
     @q.sorts = [ "last_name asc", "created_at desc" ] if @q.sorts.empty?
 
@@ -13,17 +13,14 @@ class Admin::UsersController < AdminController
   end
 
   def show
-    authorize(controller_class)
     @instance = controller_class.find(params[:id])
   end
 
   def new
-    authorize(controller_class)
     @instance = controller_class.new
   end
 
   def create
-    authorize(controller_class)
     temp_pw = SecureRandom.hex(16)
     params[:user][:password] = temp_pw
     params[:user][:password_confirmation] = temp_pw
@@ -36,12 +33,10 @@ class Admin::UsersController < AdminController
   end
 
   def edit
-    authorize(controller_class)
     @instance = controller_class.find(params[:id])
   end
 
   def update
-    authorize(controller_class)
     instance = controller_class.find(params[:id])
     original_instance = instance.dup
 
@@ -53,7 +48,6 @@ class Admin::UsersController < AdminController
   end
 
   def destroy
-    authorize(controller_class)
     instance = controller_class.find(params[:id])
     instance.archive
 
@@ -63,8 +57,6 @@ class Admin::UsersController < AdminController
   end
 
   def collection_export_xlsx
-    authorize(controller_class)
-
     sql = %(
       SELECT
         users.id AS id,
@@ -95,25 +87,11 @@ class Admin::UsersController < AdminController
     )
   end
 
-  def impersonate
-    authorize(controller_class)
-    user = User.find(params[:id])
-
-    impersonate_user(user)
-
-    user.log(user: true_user, operation: action_name, meta: user.to_json)
-    redirect_to impersonation_status_path
-  end
-
-  def stop_impersonating
-    authorize(controller_class)
-
-    current_user.log(user: true_user, operation: action_name, meta: current_user.to_json)
-    stop_impersonating_user
-    redirect_to root_path
-  end
-
   private
+
+  def authorize_user
+    authorize([ :admin, controller_class ])
+  end
 
   def create_params
     params.require(:user).permit(

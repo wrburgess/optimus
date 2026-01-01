@@ -2,18 +2,9 @@
 
 <%= render Admin::DashboardContainer::Component.new do |container| %>
   <div class="row my-3">
-    <div class="col-6">
-      <%= render Admin::DashboardCard::Component.new(title: "Media") do |card| %>
-        <% card.with_link(name: "Organizations", url: admin_organizations_path, policy: Organization) %>
-        <% card.with_link(name: "External Applications", url: admin_external_applications_path, policy: ExternalApplication) %>
-      <% end %>
-    </div>
-
-    <div class="col-6">
+    <div class="col-12">
       <%= render Admin::DashboardCard::Component.new(title: "Management") do |card| %>
         <% card.with_link(name: "Data Logs", url: polymorphic_path([:admin, DataLog]), policy: DataLog) %>
-        <% card.with_link(name: "Inbound Request Logs", url: polymorphic_path([:admin, InboundRequestLog]), policy: InboundRequestLog) %>
-        <% card.with_link(name: "Reports", url: polymorphic_path([:admin, Report]), policy: Report) %>
         <% card.with_link(name: "System Groups", url: polymorphic_path([:admin, SystemGroup]), policy: SystemGroup) %>
         <% card.with_link(name: "System Permissions", url: polymorphic_path([:admin, SystemPermission]), policy: SystemPermission) %>
         <% card.with_link(name: "System Roles", url: polymorphic_path([:admin, SystemRole]), policy: SystemRole) %>
