@@ -1,9 +1,4 @@
 class Admin::UsersController < AdminController
-  include Pagy::Method
-
-  before_action :authenticate_user!
-  before_action :authorize_user
-
   def index
     @q = controller_class.actives.ransack(params[:q])
     @q.sorts = [ "last_name asc", "created_at desc" ] if @q.sorts.empty?
@@ -88,10 +83,6 @@ class Admin::UsersController < AdminController
   end
 
   private
-
-  def authorize_user
-    authorize([ :admin, controller_class ])
-  end
 
   def create_params
     params.require(:user).permit(

@@ -4,6 +4,7 @@ class AdminController < ApplicationController
   layout "admin"
 
   before_action :authenticate_user!
+  before_action :authorize_user!
 
   def destroy
     @instance = @model_class.find(params[:id])
@@ -36,6 +37,10 @@ class AdminController < ApplicationController
   end
 
   private
+
+  def authorize_user!
+    authorize([ :admin, controller_class ])
+  end
 
   def policy_class
     "Admin::#{controller_name.classify}Policy".constantize

@@ -1,8 +1,4 @@
 class Admin::SystemPermissionsController < AdminController
-  include Pagy::Method
-
-  before_action :authenticate_user!
-
   def index
     authorize(controller_class)
     @q = controller_class.ransack(params[:q])

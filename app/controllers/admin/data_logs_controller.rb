@@ -1,9 +1,4 @@
 class Admin::DataLogsController < AdminController
-  include Pagy::Method
-
-  before_action :authenticate_user!
-  before_action :authorize_user
-
   def index
     @q = controller_class.ransack(params[:q])
     @q.sorts = controller_class.default_sort if @q.sorts.empty?
@@ -43,11 +38,5 @@ class Admin::DataLogsController < AdminController
       filename: helpers.file_name_with_timestamp(file_name: file_name, file_extension: "xlsx"),
       type: Mime[:xlsx]
     )
-  end
-
-  private
-
-  def authorize_user
-    authorize([ :admin, controller_class ])
   end
 end

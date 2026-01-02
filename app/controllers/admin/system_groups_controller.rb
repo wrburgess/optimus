@@ -2,6 +2,7 @@ class Admin::SystemGroupsController < AdminController
   include Pagy::Method
 
   before_action :authenticate_user!
+  before_action :authorize_user!
 
   def index
     authorize(controller_class)
