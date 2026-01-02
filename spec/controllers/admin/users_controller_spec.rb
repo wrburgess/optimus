@@ -121,12 +121,14 @@ describe Admin::UsersController, type: :controller do
   end
 
   context 'when authenticated but unauthorized' do
-    it 'returns unauthorized status via the Pundit handler for index' do
+    before do
       allow_any_instance_of(described_class).to receive(:authorize).and_raise(Pundit::NotAuthorizedError)
       allow_any_instance_of(ApplicationController).to receive(:user_not_authorized) do |controller, _exception|
         controller.render(plain: 'unauthorized', status: :unauthorized)
       end
+    end
 
+    it 'returns unauthorized status via the Pundit handler for index' do
       get :index
 
       expect(response).to have_http_status(:unauthorized)
@@ -135,10 +137,6 @@ describe Admin::UsersController, type: :controller do
 
     it 'returns unauthorized status via the Pundit handler for show' do
       user = create(:user)
-      allow_any_instance_of(described_class).to receive(:authorize).and_raise(Pundit::NotAuthorizedError)
-      allow_any_instance_of(ApplicationController).to receive(:user_not_authorized) do |controller, _exception|
-        controller.render(plain: 'unauthorized', status: :unauthorized)
-      end
 
       get :show, params: { id: user.id }
 
@@ -147,11 +145,6 @@ describe Admin::UsersController, type: :controller do
     end
 
     it 'returns unauthorized status via the Pundit handler for new' do
-      allow_any_instance_of(described_class).to receive(:authorize).and_raise(Pundit::NotAuthorizedError)
-      allow_any_instance_of(ApplicationController).to receive(:user_not_authorized) do |controller, _exception|
-        controller.render(plain: 'unauthorized', status: :unauthorized)
-      end
-
       get :new
 
       expect(response).to have_http_status(:unauthorized)
@@ -160,10 +153,6 @@ describe Admin::UsersController, type: :controller do
 
     it 'returns unauthorized status via the Pundit handler for edit' do
       user = create(:user)
-      allow_any_instance_of(described_class).to receive(:authorize).and_raise(Pundit::NotAuthorizedError)
-      allow_any_instance_of(ApplicationController).to receive(:user_not_authorized) do |controller, _exception|
-        controller.render(plain: 'unauthorized', status: :unauthorized)
-      end
 
       get :edit, params: { id: user.id }
 
@@ -172,11 +161,6 @@ describe Admin::UsersController, type: :controller do
     end
 
     it 'returns unauthorized status via the Pundit handler for create' do
-      allow_any_instance_of(described_class).to receive(:authorize).and_raise(Pundit::NotAuthorizedError)
-      allow_any_instance_of(ApplicationController).to receive(:user_not_authorized) do |controller, _exception|
-        controller.render(plain: 'unauthorized', status: :unauthorized)
-      end
-
       post :create, params: { user: { email: 'test@example.com' } }
 
       expect(response).to have_http_status(:unauthorized)
@@ -185,10 +169,6 @@ describe Admin::UsersController, type: :controller do
 
     it 'returns unauthorized status via the Pundit handler for update' do
       user = create(:user)
-      allow_any_instance_of(described_class).to receive(:authorize).and_raise(Pundit::NotAuthorizedError)
-      allow_any_instance_of(ApplicationController).to receive(:user_not_authorized) do |controller, _exception|
-        controller.render(plain: 'unauthorized', status: :unauthorized)
-      end
 
       patch :update, params: { id: user.id, user: { first_name: 'Updated' } }
 
@@ -198,10 +178,6 @@ describe Admin::UsersController, type: :controller do
 
     it 'returns unauthorized status via the Pundit handler for destroy' do
       user = create(:user)
-      allow_any_instance_of(described_class).to receive(:authorize).and_raise(Pundit::NotAuthorizedError)
-      allow_any_instance_of(ApplicationController).to receive(:user_not_authorized) do |controller, _exception|
-        controller.render(plain: 'unauthorized', status: :unauthorized)
-      end
 
       delete :destroy, params: { id: user.id }
 
