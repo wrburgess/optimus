@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   def controller_class
-    controller_name.classify.constantize
+    controller_name.classify.safe_constantize
   end
 
   def controller_class_plural

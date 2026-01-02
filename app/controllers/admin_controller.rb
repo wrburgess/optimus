@@ -39,7 +39,11 @@ class AdminController < ApplicationController
   private
 
   def authorize_user!
-    authorize([ :admin, controller_class ])
+    if (klass = controller_class)
+      authorize([ :admin, klass ])
+    else
+      authorize([ :admin, controller_name.to_sym ], policy_class: policy_class)
+    end
   end
 
   def policy_class
