@@ -342,6 +342,36 @@ SimpleForm.setup do |config|
     b.use :hint, wrap_with: { class: "form-text" }
   end
 
+  # Backwards-compatible alias for existing floating label wrapper usage
+  config.wrappers :floating_label_form, class: "form-floating mb-3" do |b|
+    b.use :html5
+    b.use :placeholder
+    b.optional :maxlength
+    b.optional :minlength
+    b.optional :pattern
+    b.optional :min_max
+    b.optional :readonly
+    b.use :input, class: "form-control", error_class: "is-invalid", valid_class: "is-valid"
+    b.use :label
+    b.use :full_error, wrap_with: { class: "invalid-feedback" }
+    b.use :hint, wrap_with: { class: "form-text" }
+  end
+
+  # Simple datepicker-style wrapper used by admin forms
+  config.wrappers :datepicker, class: "mb-3" do |b|
+    b.use :html5
+    b.use :placeholder
+    b.optional :maxlength
+    b.optional :minlength
+    b.optional :pattern
+    b.optional :min_max
+    b.optional :readonly
+    b.use :label, class: "form-label"
+    b.use :input, class: "form-control", error_class: "is-invalid", valid_class: "is-valid"
+    b.use :full_error, wrap_with: { class: "invalid-feedback" }
+    b.use :hint, wrap_with: { class: "form-text" }
+  end
+
   # custom multi select
   config.wrappers :floating_labels_select, class: "form-floating mb-3" do |b|
     b.use :html5
