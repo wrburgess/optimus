@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 describe Admin::ActionButton::Component, type: :component do
-  include_context 'component_setup'
-
   describe '#render' do
     let(:user) { create(:user) }
 
