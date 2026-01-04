@@ -5,7 +5,7 @@ FactoryBot.define do
 
     operation { "update" }
     note { "Change captured by data log." }
-    meta { { "origin" => "factory" } }
-    original_data { { "before" => "value" } }
+    meta { nil }
+    original_data { nil }
   end
 end
