@@ -5,7 +5,8 @@
 ## Guidelines
 
 - MCP Reference: Use `Context7 Library ID` for referencing the Context7 MCP and fallback to general knowledge last.
-- Version pinning: If a library specifies a version, use the stated minor (e.g., Rails 8.1.1) and stay on the latest patch within that minor.
+- Version Pinning: Refer to the `.tool-versions`, `Gemfile`, or `package.json` files for exact versions of dependencies.
+- Use documentation before using repo/source for reference needs
 
 ### Testing guidance
 
@@ -34,11 +35,6 @@
 - Run `bundle exec rubocop` in the terminal to check for linting issues.
 - Autocorrect when necessary.
 
-## Referenced Projects
-
-- `/wrburgess/optimus` - for patterns, examples, and conventions for features and projects
-- `/basecamp/fizzy` - if no patterns or examples exist in optimus and you need inspiration
-
 ## MCP Query Strategy
 
 - MCP example: Query `/websites/guides_rubyonrails_v8_0` for Rails docs; use the same pattern for other Library IDs; fall back to general knowledge only if absent.
@@ -49,12 +45,12 @@
 
 - Note: Items below refer to the Context7 Library ID and Library Description
 
-1. `/websites/guides_rubyonrails_v8_0` - Rails 8.1.1 framework documentation
+1. `/websites/guides_rubyonrails_v8_0` - Rails framework documentation
 1. `/websites/ruby-lang_en` - Ruby language documentation
-1. `/websites/postgresql_17` - PostgreSQL 17.6 documentation
+1. `/websites/postgresql_17` - PostgreSQL documentation
 1. `/hotwired/turbo-rails` - Turbo/Hotwire
 1. `/hotwired/stimulus-rails` - Stimulus JS documentation
-1. `/websites/getbootstrap_5_3` - Bootstrap 5.3 documentation
+1. `/websites/getbootstrap_5_3` - Bootstrap documentation
 1. `/rspec/rspec-rails` - Testing documentation
 1. `/rails/rails` - Ruby on Rails framework
 1. `/ruby/ruby` - Ruby language repo
@@ -78,3 +74,8 @@
 - `/thoughtbot/factory_bot_rails` - Factory management for specs
 - `/teamcapybara/capybara` - Browser based testing library
 - `/puma/puma` - Web server library
+
+## Referenced Projects
+
+- `/wrburgess/optimus` - for patterns, examples, and conventions for features and projects
+- `/basecamp/fizzy` - if no patterns or examples exist in optimus and you need inspiration
