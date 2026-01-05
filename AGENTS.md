@@ -1,6 +1,6 @@
 ## Rails Documentation Stack (Context7)
 
-When answering questions about code, APIs, configuration, or implementation, automatically use Context7 MCP to fetch up-to-date documentation.
+Always use Context7 MCP when we need library/API documentation, code generation, setup or configuration steps without anyone having to explicitly ask.
 
 ## Core Libraries (Query in Priority Order)
 
