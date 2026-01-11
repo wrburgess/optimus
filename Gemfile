@@ -37,7 +37,7 @@ gem "solid_queue", "1.2.4"
 gem "stimulus-rails", "1.3.4"
 gem "thruster", "0.1.17", require: false
 gem "turbo-rails", "2.0.20"
-gem "view_component", "4.1.1"
+gem "view_component", "4.2.0"
 
 group :development, :staging do
   gem "lookbook", "2.3.14"
