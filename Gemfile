@@ -33,7 +33,7 @@ gem "roo", "3.0.0"
 gem "simple_form", "5.4.1"
 gem "solid_cable", "3.0.12"
 gem "solid_cache", "1.0.10"
-gem "solid_queue", "1.2.4"
+gem "solid_queue", "1.3.0"
 gem "stimulus-rails", "1.3.4"
 gem "thruster", "0.1.17", require: false
 gem "turbo-rails", "2.0.20"
