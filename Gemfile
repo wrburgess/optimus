@@ -8,7 +8,7 @@ gem "rails", "8.1.2"
 
 gem "awesome_print", "1.9.2"
 gem "blazer", "3.3.0"
-gem "bootsnap", "1.21.0", require: false
+gem "bootsnap", "1.21.1", require: false
 gem "caxlsx_rails", "0.6.4"
 gem "cssbundling-rails", "1.4.3"
 gem "csv", "3.3.5"
