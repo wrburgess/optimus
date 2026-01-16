@@ -301,7 +301,7 @@ GEM
       racc (~> 1.4)
     orm_adapter (0.5.0)
     ostruct (0.6.3)
-    pagy (43.2.4)
+    pagy (43.2.6)
       json
       yaml
     parallel (1.27.0)
@@ -507,7 +507,7 @@ GEM
       activejob (>= 7.2)
       activerecord (>= 7.2)
       railties (>= 7.2)
-    solid_queue (1.3.0)
+    solid_queue (1.3.1)
       activejob (>= 7.1)
       activerecord (>= 7.1)
       concurrent-ruby (>= 1.3.1)
@@ -609,7 +609,7 @@ DEPENDENCIES
   kamal
   lookbook (= 2.3.14)
   maintenance_tasks (= 2.13.0)
-  pagy (= 43.2.4)
+  pagy (= 43.2.6)
   pg (= 1.6.3)
   pghero (= 3.7.0)
   propshaft (= 1.3.1)
@@ -637,7 +637,7 @@ DEPENDENCIES
   simple_form (= 5.4.1)
   solid_cable (= 3.0.12)
   solid_cache (= 1.0.10)
-  solid_queue (= 1.3.0)
+  solid_queue (= 1.3.1)
   stimulus-rails (= 1.3.4)
   thruster (= 0.1.17)
   timecop (= 0.9.10)
@@ -759,7 +759,7 @@ CHECKSUMS
   nokogiri (1.19.0-x86_64-linux-musl) sha256=1c4ca6b381622420073ce6043443af1d321e8ed93cc18b08e2666e5bd02ffae4
   orm_adapter (0.5.0) sha256=aa5d0be5d540cbb46d3a93e88061f4ece6a25f6e97d6a47122beb84fe595e9b9
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
-  pagy (43.2.4) sha256=b0574f8105e5cc45ed37c4633789a7a64cb517b9e5af2bf697b22c5e880c5f0f
+  pagy (43.2.6) sha256=d4c02090727f355a27b27bd9894e5679abc036e081afa011bb306c24ece125e7
   parallel (1.27.0) sha256=4ac151e1806b755fb4e2dc2332cbf0e54f2e24ba821ff2d3dcf86bf6dc4ae130
   parser (3.3.10.1) sha256=06f6a725d2cd91e5e7f2b7c32ba143631e1f7c8ae2fb918fc4cebec187e6a688
   pg (1.6.3) sha256=1388d0563e13d2758c1089e35e973a3249e955c659592d10e5b77c468f628a99
@@ -830,7 +830,7 @@ CHECKSUMS
   simple_form (5.4.1) sha256=58c3d229034c7e5545035c3271b6f030ef730c340b9d7d8eb730e0a385b20808
   solid_cable (3.0.12) sha256=a168a54731a455d5627af48d8441ea3b554b8c1f6e6cd6074109de493e6b0460
   solid_cache (1.0.10) sha256=bc05a2fb3ac78a6f43cbb5946679cf9db67dd30d22939ededc385cb93e120d41
-  solid_queue (1.3.0) sha256=1a1d9810e0d5334d2cde7955b3701e2f4fdb07e67dbd32be27f6ba7ba3fa27f6
+  solid_queue (1.3.1) sha256=d9580111180c339804ff1a810a7768f69f5dc694d31e86cf1535ff2cd7a87428
   sshkit (1.25.0) sha256=c8c6543cdb60f91f1d277306d585dd11b6a064cb44eab0972827e4311ff96744
   stimulus-rails (1.3.4) sha256=765676ffa1f33af64ce026d26b48e8ffb2e0b94e0f50e9119e11d6107d67cb06
   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
