@@ -27,7 +27,7 @@ RSpec.describe NotificationMessage, type: :model do
       first = create(:notification_message, created_at: 1.hour.ago)
       second = create(:notification_message, created_at: Time.current)
 
-      expect(described_class.select_order.pluck(:id)).to eq([second.id, first.id])
+      expect(described_class.select_order.pluck(:id)).to eq([ second.id, first.id ])
     end
   end
 end

@@ -92,7 +92,7 @@ RSpec.describe "Notification Integration", type: :request do
       }
 
       # Run without processing summarized notifications
-      perform_enqueued_jobs(only: [NotifyTopicJob, ProcessImmediateNotificationsJob, DistributeNotificationJob]) do
+      perform_enqueued_jobs(only: [ NotifyTopicJob, ProcessImmediateNotificationsJob, DistributeNotificationJob ]) do
         post admin_users_path, params: { user: user_params }
       end
 

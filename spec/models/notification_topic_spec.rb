@@ -38,7 +38,7 @@ RSpec.describe NotificationTopic, type: :model do
       second = create(:notification_topic, name: "Zebra Topic")
       first = create(:notification_topic, name: "Alpha Topic")
 
-      expect(described_class.select_order.pluck(:id)).to eq([first.id, second.id])
+      expect(described_class.select_order.pluck(:id)).to eq([ first.id, second.id ])
     end
   end
 
@@ -46,7 +46,7 @@ RSpec.describe NotificationTopic, type: :model do
     it "returns name and id pairs" do
       topic = create(:notification_topic, name: "User Created")
 
-      expect(described_class.options_for_select).to include(["User Created", topic.id])
+      expect(described_class.options_for_select).to include([ "User Created", topic.id ])
     end
   end
 

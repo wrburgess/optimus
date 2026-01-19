@@ -37,7 +37,7 @@ RSpec.describe DistributeSummarizedNotificationsJob, type: :job do
         described_class.perform_now(
           user_id: user.id,
           distribution_method: "email",
-          notification_queue_item_ids: [item1.id, item2.id]
+          notification_queue_item_ids: [ item1.id, item2.id ]
         )
       end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
@@ -47,10 +47,10 @@ RSpec.describe DistributeSummarizedNotificationsJob, type: :job do
         described_class.perform_now(
           user_id: user.id,
           distribution_method: "email",
-          notification_queue_item_ids: [item1.id, item2.id]
+          notification_queue_item_ids: [ item1.id, item2.id ]
         )
 
-        [item1, item2].each do |item|
+        [ item1, item2 ].each do |item|
           item.reload
           expect(item.distributed_at).to eq(Time.current)
         end
@@ -63,7 +63,7 @@ RSpec.describe DistributeSummarizedNotificationsJob, type: :job do
       described_class.perform_now(
         user_id: user.id,
         distribution_method: "email",
-        notification_queue_item_ids: [item1.id, item2.id]
+        notification_queue_item_ids: [ item1.id, item2.id ]
       )
 
       expect(ActionMailer::Base.deliveries.count).to eq(1)
@@ -74,7 +74,7 @@ RSpec.describe DistributeSummarizedNotificationsJob, type: :job do
         described_class.perform_now(
           user_id: 0,
           distribution_method: "email",
-          notification_queue_item_ids: [item1.id]
+          notification_queue_item_ids: [ item1.id ]
         )
       end.not_to change { ActionMailer::Base.deliveries.count }
     end
@@ -87,7 +87,7 @@ RSpec.describe DistributeSummarizedNotificationsJob, type: :job do
         described_class.perform_now(
           user_id: user.id,
           distribution_method: "email",
-          notification_queue_item_ids: [item1.id, item2.id]
+          notification_queue_item_ids: [ item1.id, item2.id ]
         )
       end.not_to change { ActionMailer::Base.deliveries.count }
     end

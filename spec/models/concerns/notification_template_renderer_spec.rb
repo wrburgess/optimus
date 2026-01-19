@@ -32,7 +32,7 @@ RSpec.describe NotificationTemplateRenderer do
 
     it "renders a template with method calls" do
       template = "Count: <%= items.count %>, First: <%= items.first %>"
-      context = { items: [1, 2, 3] }
+      context = { items: [ 1, 2, 3 ] }
 
       result = described_class.render(template, context)
 

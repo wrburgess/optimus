@@ -14,7 +14,7 @@ RSpec.describe NotificationMailer, type: :mailer do
 
     it "renders the headers" do
       expect(mail.subject).to eq("Password Changed")
-      expect(mail.to).to eq(["test@example.com"])
+      expect(mail.to).to eq([ "test@example.com" ])
     end
 
     it "renders the body" do
@@ -35,13 +35,13 @@ RSpec.describe NotificationMailer, type: :mailer do
     let(:mail) do
       described_class.summarized_notification(
         user: user,
-        messages: [message1, message2]
+        messages: [ message1, message2 ]
       )
     end
 
     it "renders the headers with correct count" do
       expect(mail.subject).to eq("You have 2 new notifications")
-      expect(mail.to).to eq(["test@example.com"])
+      expect(mail.to).to eq([ "test@example.com" ])
     end
 
     it "renders all messages in the body" do
@@ -60,7 +60,7 @@ RSpec.describe NotificationMailer, type: :mailer do
       let(:mail) do
         described_class.summarized_notification(
           user: user,
-          messages: [message1]
+          messages: [ message1 ]
         )
       end
 

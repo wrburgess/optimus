@@ -60,7 +60,7 @@ class Admin::UsersController < AdminController
     instance.log(user: current_user, operation: action_name)
     instance.notify_topic("user.password_changed", context: { user: instance, changed_by: current_user })
     flash[:success] = "Password reset email sent to #{instance.email}"
-    redirect_to polymorphic_path([:admin, instance])
+    redirect_to polymorphic_path([ :admin, instance ])
   end
 
   def collection_export_xlsx

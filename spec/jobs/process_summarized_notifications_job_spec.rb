@@ -27,7 +27,7 @@ RSpec.describe ProcessSummarizedNotificationsJob, type: :job do
       end.to have_enqueued_job(DistributeSummarizedNotificationsJob).with(
         user_id: user.id,
         distribution_method: "email",
-        notification_queue_item_ids: [item.id]
+        notification_queue_item_ids: [ item.id ]
       )
     end
 

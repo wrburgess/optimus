@@ -53,7 +53,7 @@ RSpec.describe NotificationTemplate, type: :model do
 
   describe ".distribution_methods_for_select" do
     it "returns titleized options" do
-      expect(described_class.distribution_methods_for_select).to include(["Email", "email"])
+      expect(described_class.distribution_methods_for_select).to include([ "Email", "email" ])
     end
   end
 end
