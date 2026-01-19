@@ -106,6 +106,34 @@ Located in `app/components/` with namespace structure:
 
 - `Archivable` - Soft delete via `archived_at` timestamp
 - `Loggable` - Audit logging to `data_logs` table
+- `Notifiable` - Trigger notifications via Topic/Subscriber pattern
+
+### Notification System
+
+A custom Topic/Subscriber notification system (see `docs/notification_system.md` for full documentation):
+
+**Quick Usage:**
+```ruby
+# In a controller action, trigger a notification
+@instance.notify_topic("resource.action", context: { model: @instance, actor: current_user })
+```
+
+**Components:**
+- `NotificationTopic` - Types of notifications (e.g., "user.created")
+- `NotificationTemplate` - ERB templates for rendering content
+- `NotificationSubscription` - Links users to topics with delivery preferences
+- `NotificationMessage` - Rendered notification content
+- `NotificationQueueItem` - Delivery scheduling and status
+
+**Delivery Frequencies:** immediate, summarized_hourly, summarized_daily
+
+**Adding New Notifications:**
+1. Create topic in `db/seeds/notification_topics.rb`
+2. Include `Notifiable` in model
+3. Call `notify_topic("topic.key", context: {...})` in controller
+4. Run `rails db:seed`
+
+See `docs/notification_system_agent_guide.md` for detailed implementation patterns.
 
 ### Mounted Engines (Admin)
 
