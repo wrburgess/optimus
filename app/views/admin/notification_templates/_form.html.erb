@@ -1,0 +1,28 @@
+<%= simple_form_for([:admin, instance], local: true) do |f| %>
+  <div class="row">
+    <div class="col-12 col-lg-6">
+      <% unless instance.new_record? %>
+        <%= f.input :id, readonly: true, wrapper: :floating_label_form %>
+      <% end %>
+      <%= f.input :notification_topic_id,
+          collection: NotificationTopic.options_for_select,
+          label: 'Topic',
+          prompt: 'Select a topic...',
+          wrapper: :floating_label_form %>
+      <%= f.input :distribution_method,
+          collection: NotificationTemplate.distribution_methods_for_select,
+          label: 'Distribution Method',
+          prompt: 'Select a method...',
+          wrapper: :floating_label_form %>
+      <%= f.input :active, as: :boolean, wrapper: :floating_label_form %>
+      <%= f.input :subject_template, wrapper: :floating_label_form, hint: "ERB template for email subject. Example: Hello &lt;%= user.name %&gt;" %>
+      <%= f.input :body_template, as: :text, wrapper: :floating_label_form, input_html: { rows: 10 }, hint: "ERB template for email body. Example: Hello &lt;%= user.name %&gt;" %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <%= render Admin::ActionButton::Component.new(operation: :cancel_to_show, instance: instance, classes_append: "me-3", public: true) %>
+      <%= render Admin::FormButton::Component.new(operation: :submit) %>
+    </div>
+  </div>
+<% end %>

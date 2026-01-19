@@ -1,0 +1,22 @@
+<%= render Admin::HeaderForShow::Component.new(
+    instance: @instance,
+    controller: params[:controller],
+    action: params[:action],
+    edit_button: true,
+    archive_button: true
+  )
+%>
+
+<%= render Admin::PageContainer::Component.new do %>
+  <%= render Admin::TableForShow::Component.new(title: 'Template Data') do |table| %>
+    <% table.with_row(name: "ID", value: @instance.id) %>
+    <% table.with_row(name: "Topic", value: link_to(@instance.notification_topic.name, polymorphic_path([:admin, @instance.notification_topic]))) %>
+    <% table.with_row(name: "Distribution Method", value: @instance.distribution_method.titleize) %>
+    <% table.with_row(name: "Active", value: @instance.active? ? "Yes" : "No") %>
+    <% table.with_row(name: "Subject Template", value: @instance.subject_template) %>
+    <% table.with_row(name: "Body Template", value: simple_format(@instance.body_template)) %>
+    <% table.with_row(name: "Archived at", value: default_date_format(@instance.archived_at)) %>
+    <% table.with_row(name: "Created at", value: default_date_format(@instance.created_at)) %>
+    <% table.with_row(name: "Updated at", value: default_date_format(@instance.updated_at)) %>
+  <% end %>
+<% end %>

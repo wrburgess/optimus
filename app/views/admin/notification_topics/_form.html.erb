@@ -1,0 +1,18 @@
+<%= simple_form_for([:admin, instance], local: true) do |f| %>
+  <div class="row">
+    <div class="col-12 col-lg-6">
+      <% unless instance.new_record? %>
+        <%= f.input :id, readonly: true, wrapper: :floating_label_form %>
+      <% end %>
+      <%= f.input :name, wrapper: :floating_label_form %>
+      <%= f.input :key, wrapper: :floating_label_form %>
+      <%= f.input :description, as: :text, wrapper: :floating_label_form %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <%= render Admin::ActionButton::Component.new(operation: :cancel_to_show, instance: instance, classes_append: "me-3", public: true) %>
+      <%= render Admin::FormButton::Component.new(operation: :submit) %>
+    </div>
+  </div>
+<% end %>

@@ -60,6 +60,12 @@ Rails.application.routes.draw do
         put :trigger_password_reset_email
       end
     end
+
+    resources :notification_topics, concerns: [:archivable, :collection_exportable]
+    resources :notification_templates, concerns: :archivable
+    resources :notification_subscriptions, concerns: [:archivable, :collection_exportable]
+    resources :notification_messages, only: [:index, :show], concerns: :collection_exportable
+    resources :notification_queue_items, only: [:index, :show], concerns: :collection_exportable
   end
 
   namespace :api, defaults: { format: "json" } do

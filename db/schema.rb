@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_31_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_19_170658) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -215,6 +215,70 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_31_000000) do
     t.index ["task_name", "status", "created_at"], name: "index_maintenance_tasks_runs", order: { created_at: :desc }
   end
 
+  create_table "notification_messages", force: :cascade do |t|
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.jsonb "metadata", default: {}
+    t.bigint "notification_topic_id", null: false
+    t.string "subject"
+    t.datetime "updated_at", null: false
+    t.index ["notification_topic_id"], name: "index_notification_messages_on_notification_topic_id"
+  end
+
+  create_table "notification_queue_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "distribute_at", null: false
+    t.datetime "distributed_at"
+    t.string "distribution_method", null: false
+    t.bigint "notification_message_id", null: false
+    t.bigint "notification_subscription_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["distribute_at", "distributed_at"], name: "index_notification_queue_items_on_distribute_distributed"
+    t.index ["notification_message_id"], name: "index_notification_queue_items_on_notification_message_id"
+    t.index ["notification_subscription_id"], name: "index_notification_queue_items_on_notification_subscription_id"
+    t.index ["user_id", "distribute_at"], name: "index_notification_queue_items_on_user_distribute"
+    t.index ["user_id"], name: "index_notification_queue_items_on_user_id"
+  end
+
+  create_table "notification_subscriptions", force: :cascade do |t|
+    t.boolean "active", default: true
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.string "distribution_frequency", null: false
+    t.string "distribution_method", null: false
+    t.bigint "notification_topic_id", null: false
+    t.integer "summarized_daily_hour"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["notification_topic_id", "user_id", "distribution_method"], name: "index_notification_subscriptions_on_topic_user_method", unique: true
+    t.index ["notification_topic_id"], name: "index_notification_subscriptions_on_notification_topic_id"
+    t.index ["user_id"], name: "index_notification_subscriptions_on_user_id"
+  end
+
+  create_table "notification_templates", force: :cascade do |t|
+    t.boolean "active", default: true
+    t.datetime "archived_at"
+    t.text "body_template"
+    t.datetime "created_at", null: false
+    t.string "distribution_method", null: false
+    t.bigint "notification_topic_id", null: false
+    t.string "subject_template"
+    t.datetime "updated_at", null: false
+    t.index ["notification_topic_id", "distribution_method"], name: "index_notification_templates_on_topic_and_method", unique: true
+    t.index ["notification_topic_id"], name: "index_notification_templates_on_notification_topic_id"
+  end
+
+  create_table "notification_topics", force: :cascade do |t|
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "key", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_notification_topics_on_key", unique: true
+  end
+
   create_table "system_group_system_roles", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "system_group_id"
@@ -313,6 +377,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_31_000000) do
     t.string "reset_password_token"
     t.integer "sign_in_count", default: 0, null: false
     t.string "suffix"
+    t.string "timezone", default: "UTC"
     t.string "unconfirmed_email"
     t.string "unlock_token"
     t.datetime "updated_at", null: false
@@ -325,6 +390,13 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_31_000000) do
   add_foreign_key "account_users", "accounts"
   add_foreign_key "account_users", "users"
   add_foreign_key "data_logs", "users"
+  add_foreign_key "notification_messages", "notification_topics"
+  add_foreign_key "notification_queue_items", "notification_messages"
+  add_foreign_key "notification_queue_items", "notification_subscriptions"
+  add_foreign_key "notification_queue_items", "users"
+  add_foreign_key "notification_subscriptions", "notification_topics"
+  add_foreign_key "notification_subscriptions", "users"
+  add_foreign_key "notification_templates", "notification_topics"
   add_foreign_key "system_group_system_roles", "system_groups"
   add_foreign_key "system_group_system_roles", "system_roles"
   add_foreign_key "system_group_users", "system_groups"

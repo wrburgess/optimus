@@ -1,0 +1,23 @@
+<%= render Admin::HeaderForShow::Component.new(
+    instance: @instance,
+    controller: params[:controller],
+    action: params[:action],
+    edit_button: true,
+    archive_button: true
+  )
+%>
+
+<%= render Admin::PageContainer::Component.new do %>
+  <%= render Admin::TableForShow::Component.new(title: 'Subscription Data') do |table| %>
+    <% table.with_row(name: "ID", value: @instance.id) %>
+    <% table.with_row(name: "Topic", value: link_to(@instance.notification_topic.name, polymorphic_path([:admin, @instance.notification_topic]))) %>
+    <% table.with_row(name: "User", value: link_to(@instance.user.full_name, polymorphic_path([:admin, @instance.user]))) %>
+    <% table.with_row(name: "Distribution Method", value: @instance.distribution_method.titleize) %>
+    <% table.with_row(name: "Distribution Frequency", value: @instance.distribution_frequency.titleize) %>
+    <% table.with_row(name: "Daily Hour", value: @instance.summarized_daily_hour) %>
+    <% table.with_row(name: "Active", value: @instance.active? ? "Yes" : "No") %>
+    <% table.with_row(name: "Archived at", value: default_date_format(@instance.archived_at)) %>
+    <% table.with_row(name: "Created at", value: default_date_format(@instance.created_at)) %>
+    <% table.with_row(name: "Updated at", value: default_date_format(@instance.updated_at)) %>
+  <% end %>
+<% end %>

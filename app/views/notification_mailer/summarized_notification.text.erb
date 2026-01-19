@@ -1,0 +1,17 @@
+<%= @subject %>
+<%= "=" * @subject.length %>
+
+Hello <%= @user.full_name %>,
+
+Here is a summary of your recent notifications:
+
+<% @messages.each do |message| %>
+--------------------
+<%= message.subject %>
+<%= message.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+
+<%= message.body %>
+
+<% end %>
+---
+This notification was sent to <%= @user.email %>.

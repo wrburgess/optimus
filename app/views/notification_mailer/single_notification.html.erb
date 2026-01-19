@@ -1,0 +1,10 @@
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <h2 style="color: #333;"><%= @subject %></h2>
+  <div style="color: #555; line-height: 1.6;">
+    <%= simple_format(@body) %>
+  </div>
+  <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+  <p style="color: #999; font-size: 12px;">
+    This notification was sent to <%= @user.email %>.
+  </p>
+</div>

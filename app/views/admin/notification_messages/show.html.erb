@@ -1,0 +1,28 @@
+<%= render Admin::HeaderForShow::Component.new(
+    instance: @instance,
+    controller: params[:controller],
+    action: params[:action],
+    edit_button: false,
+    delete_button: false
+  )
+%>
+
+<%= render Admin::PageContainer::Component.new do %>
+  <%= render Admin::TableForShow::Component.new(title: 'Message Data') do |table| %>
+    <% table.with_row(name: "ID", value: @instance.id) %>
+    <% table.with_row(name: "Topic", value: link_to(@instance.notification_topic.name, polymorphic_path([:admin, @instance.notification_topic]))) %>
+    <% table.with_row(name: "Subject", value: @instance.subject) %>
+    <% table.with_row(name: "Body", value: simple_format(@instance.body)) %>
+    <% table.with_row(name: "Metadata", value: @instance.metadata.to_json) %>
+    <% table.with_row(name: "Created at", value: default_date_format(@instance.created_at)) %>
+    <% table.with_row(name: "Updated at", value: default_date_format(@instance.updated_at)) %>
+  <% end %>
+
+  <%= render Admin::TableForIndex::Component.new(title: 'Queue Items', data: @instance.notification_queue_items) do |table| %>
+    <% table.with_column("ID") { |instance| instance.id.to_s } %>
+    <% table.with_column("User") { |instance| link_to(instance.user.full_name, polymorphic_path([:admin, instance.user])) } %>
+    <% table.with_column("Method") { |instance| instance.distribution_method.titleize } %>
+    <% table.with_column("Distribute at") { |instance| default_date_format(instance.distribute_at) } %>
+    <% table.with_column("Distributed at") { |instance| default_date_format(instance.distributed_at) } %>
+  <% end %>
+<% end %>

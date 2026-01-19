@@ -5,3 +5,4 @@
 
 require_relative './seeds/system_user'
 require_relative './seeds/system_permissions'
+require_relative './seeds/notification_topics'

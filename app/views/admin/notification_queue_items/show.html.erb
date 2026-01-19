@@ -1,0 +1,23 @@
+<%= render Admin::HeaderForShow::Component.new(
+    instance: @instance,
+    controller: params[:controller],
+    action: params[:action],
+    edit_button: false,
+    delete_button: false
+  )
+%>
+
+<%= render Admin::PageContainer::Component.new do %>
+  <%= render Admin::TableForShow::Component.new(title: 'Queue Item Data') do |table| %>
+    <% table.with_row(name: "ID", value: @instance.id) %>
+    <% table.with_row(name: "User", value: link_to(@instance.user.full_name, polymorphic_path([:admin, @instance.user]))) %>
+    <% table.with_row(name: "Message", value: link_to(@instance.notification_message.subject, polymorphic_path([:admin, @instance.notification_message]))) %>
+    <% table.with_row(name: "Subscription", value: link_to("View Subscription", polymorphic_path([:admin, @instance.notification_subscription]))) %>
+    <% table.with_row(name: "Distribution Method", value: @instance.distribution_method.titleize) %>
+    <% table.with_row(name: "Distribute at", value: default_date_format(@instance.distribute_at)) %>
+    <% table.with_row(name: "Distributed at", value: default_date_format(@instance.distributed_at)) %>
+    <% table.with_row(name: "Status", value: @instance.distributed? ? "Sent" : "Pending") %>
+    <% table.with_row(name: "Created at", value: default_date_format(@instance.created_at)) %>
+    <% table.with_row(name: "Updated at", value: default_date_format(@instance.updated_at)) %>
+  <% end %>
+<% end %>

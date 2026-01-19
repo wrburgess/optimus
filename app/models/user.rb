@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   include Archivable
   include Loggable
+  include Notifiable
 
   validates :email, presence: true, uniqueness: true
 
@@ -22,6 +23,8 @@ class User < ApplicationRecord
   has_many :system_groups, through: :system_group_users
   has_many :system_roles, through: :system_groups
   has_many :system_permissions, through: :system_roles
+  has_many :notification_subscriptions, dependent: :destroy
+  has_many :notification_queue_items, dependent: :destroy
 
   scope :select_order, -> { order(last_name: :asc, first_name: :asc) }
 

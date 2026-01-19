@@ -1,0 +1,22 @@
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <h2 style="color: #333;"><%= @subject %></h2>
+  <p style="color: #666;">Hello <%= @user.full_name %>,</p>
+  <p style="color: #666;">Here is a summary of your recent notifications:</p>
+
+  <% @messages.each do |message| %>
+    <div style="background: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 4px;">
+      <h3 style="color: #333; margin: 0 0 10px 0;"><%= message.subject %></h3>
+      <div style="color: #555; line-height: 1.6;">
+        <%= simple_format(message.body) %>
+      </div>
+      <p style="color: #999; font-size: 11px; margin: 10px 0 0 0;">
+        <%= message.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+      </p>
+    </div>
+  <% end %>
+
+  <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+  <p style="color: #999; font-size: 12px;">
+    This notification was sent to <%= @user.email %>.
+  </p>
+</div>

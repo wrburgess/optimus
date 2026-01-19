@@ -1,0 +1,33 @@
+<%= render Admin::HeaderForShow::Component.new(
+    instance: @instance,
+    controller: params[:controller],
+    action: params[:action],
+    edit_button: true,
+    archive_button: true
+  )
+%>
+
+<%= render Admin::PageContainer::Component.new do %>
+  <%= render Admin::TableForShow::Component.new(title: 'Topic Data') do |table| %>
+    <% table.with_row(name: "ID", value: @instance.id) %>
+    <% table.with_row(name: "Name", value: @instance.name) %>
+    <% table.with_row(name: "Key", value: @instance.key) %>
+    <% table.with_row(name: "Description", value: @instance.description) %>
+    <% table.with_row(name: "Archived at", value: default_date_format(@instance.archived_at)) %>
+    <% table.with_row(name: "Created at", value: default_date_format(@instance.created_at)) %>
+    <% table.with_row(name: "Updated at", value: default_date_format(@instance.updated_at)) %>
+  <% end %>
+
+  <%= render Admin::TableForIndex::Component.new(title: 'Templates', data: @instance.notification_templates) do |table| %>
+    <% table.with_column("ID") { |instance| instance.id.to_s } %>
+    <% table.with_column("Method") { |instance| link_to(instance.distribution_method.titleize, polymorphic_path([:admin, instance])) } %>
+    <% table.with_column("Active") { |instance| instance.active? ? "Yes" : "No" } %>
+  <% end %>
+
+  <%= render Admin::TableForIndex::Component.new(title: 'Subscriptions', data: @instance.notification_subscriptions) do |table| %>
+    <% table.with_column("ID") { |instance| instance.id.to_s } %>
+    <% table.with_column("User") { |instance| link_to(instance.user.full_name, polymorphic_path([:admin, instance.user])) } %>
+    <% table.with_column("Method") { |instance| instance.distribution_method.titleize } %>
+    <% table.with_column("Frequency") { |instance| instance.distribution_frequency.titleize } %>
+  <% end %>
+<% end %>

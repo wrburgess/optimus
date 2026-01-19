@@ -1,0 +1,35 @@
+<%= render Admin::HeaderForIndex::Component.new(
+    instance: @instance,
+    controller: params[:controller],
+    action: params[:action],
+    new_button: true,
+    show_filtering: true
+  )
+%>
+
+<%= render Admin::PageContainer::Component.new do %>
+
+  <%= render Admin::TableForIndex::Component.new(data: @instances) do |table| %>
+    <% table.with_column(sort_link([:admin, @q], :id, "ID")) { |instance| instance.id.to_s } %>
+    <% table.with_column(sort_link([:admin, @q], :notification_topic_id, "Topic")) { |instance| instance.notification_topic.name } %>
+    <% table.with_column(sort_link([:admin, @q], :distribution_method, "Method")) { |instance| instance.distribution_method.titleize } %>
+    <% table.with_column(sort_link([:admin, @q], :active, "Active")) { |instance| instance.active? ? "Yes" : "No" } %>
+    <% table.with_column(sort_link([:admin, @q], :updated_at, "Updated")) { |instance| default_date_format(instance.updated_at) } %>
+    <% table.with_column("Actions") do |instance| %>
+      <%= render Admin::ActionButton::Component.new(operation: :show, instance: instance, button_classes: "me-3", icon_classes: :none) %>
+      <%= render Admin::ActionButton::Component.new(operation: :edit, instance: instance, button_classes: :none, icon_classes: :none) %>
+    <% end %>
+  <% end %>
+
+  <%= render Admin::IndexPager::Component.new(pagy: @pagy, instance: @instance) %>
+
+  <%= render Admin::FilterCard::Component.new do %>
+    <%= simple_form_for [:admin, @q], url: polymorphic_path([:admin, @instance]), html: { method: :get }, wrapper: :floating_labels_form do |f| %>
+      <%= f.input :id_eq, label: "ID", placeholder: "ID equals" %>
+      <%= f.input :distribution_method_eq, label: "Method", collection: NotificationTemplate.distribution_methods_for_select, include_blank: true %>
+
+      <%= render Admin::FormButton::Component.new(operation: :filter) %>
+      <%= render Admin::LinkButton::Component.new(text: 'Reset Form', path: request.path) %>
+    <% end %>
+  <% end %>
+<% end %>
