@@ -2,6 +2,17 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Required Workflow
+
+**ALWAYS run these checks before committing or pushing:**
+
+```bash
+bundle exec rubocop -a    # Fix lint errors
+bundle exec rspec         # Run all tests
+```
+
+Both must pass before any `git commit` or `git push`. No exceptions.
+
 ## Setup After Cloning
 
 ### MCP Configuration
