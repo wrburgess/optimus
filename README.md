@@ -9,3 +9,7 @@
 ## Dependency Management
 
 - See the [Dependency Management](docs/dependency_management.md) document
+
+## Notification System
+
+- See the [Notification System](docs/notification_system.md) document
