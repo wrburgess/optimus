@@ -30,6 +30,14 @@
           <% nav_item.with_dropdown_item(resource: User, name: "System Users", path: admin_users_path) %>
         <% end %>
 
+        <%= render Admin::NavItem::Component.new(title: "Notifications") do |nav_item| %>
+          <% nav_item.with_dropdown_item(resource: NotificationTopic, name: "Topics", path: admin_notification_topics_path) %>
+          <% nav_item.with_dropdown_item(resource: NotificationTemplate, name: "Templates", path: admin_notification_templates_path) %>
+          <% nav_item.with_dropdown_item(resource: NotificationSubscription, name: "Subscriptions", path: admin_notification_subscriptions_path) %>
+          <% nav_item.with_dropdown_item(resource: NotificationMessage, name: "Messages", path: admin_notification_messages_path) %>
+          <% nav_item.with_dropdown_item(resource: NotificationQueueItem, name: "Queue Items", path: admin_notification_queue_items_path) %>
+        <% end %>
+
         <%= render Admin::UserLogin::Component.new(user_signed_in: user_signed_in?) %>
       </ul>
     </div>

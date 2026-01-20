@@ -2,13 +2,23 @@
 
 <%= render Admin::DashboardContainer::Component.new do |container| %>
   <div class="row my-3">
-    <div class="col-12">
+    <div class="col-6">
       <%= render Admin::DashboardCard::Component.new(title: "Management") do |card| %>
-        <% card.with_link(name: "Data Logs", url: polymorphic_path([:admin, DataLog]), policy: DataLog) %>
-        <% card.with_link(name: "System Groups", url: polymorphic_path([:admin, SystemGroup]), policy: SystemGroup) %>
-        <% card.with_link(name: "System Permissions", url: polymorphic_path([:admin, SystemPermission]), policy: SystemPermission) %>
-        <% card.with_link(name: "System Roles", url: polymorphic_path([:admin, SystemRole]), policy: SystemRole) %>
-        <% card.with_link(name: "System Users", url: polymorphic_path([:admin, User]), policy: User) %>
+        <% card.with_link(name: "Data Logs", url: polymorphic_path([ :admin, DataLog ]), policy: DataLog) %>
+        <% card.with_link(name: "System Groups", url: polymorphic_path([ :admin, SystemGroup ]), policy: SystemGroup) %>
+        <% card.with_link(name: "System Permissions", url: polymorphic_path([ :admin, SystemPermission ]), policy: SystemPermission) %>
+        <% card.with_link(name: "System Roles", url: polymorphic_path([ :admin, SystemRole ]), policy: SystemRole) %>
+        <% card.with_link(name: "System Users", url: polymorphic_path([ :admin, User ]), policy: User) %>
+      <% end %>
+    </div>
+
+    <div class="col-6">
+      <%= render Admin::DashboardCard::Component.new(title: "Notifications") do |card| %>
+        <% card.with_link(name: "Topics", url: polymorphic_path([ :admin, NotificationTopic ]), policy: NotificationTopic) %>
+        <% card.with_link(name: "Templates", url: polymorphic_path([ :admin, NotificationTemplate ]), policy: NotificationTemplate) %>
+        <% card.with_link(name: "Subscriptions", url: polymorphic_path([ :admin, NotificationSubscription ]), policy: NotificationSubscription) %>
+        <% card.with_link(name: "Messages", url: polymorphic_path([ :admin, NotificationMessage ]), policy: NotificationMessage) %>
+        <% card.with_link(name: "Queue Items", url: polymorphic_path([ :admin, NotificationQueueItem ]), policy: NotificationQueueItem) %>
       <% end %>
     </div>
   </div>
