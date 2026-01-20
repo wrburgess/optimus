@@ -31,38 +31,57 @@ else
   exit 1
 fi
 
-# Check for outdated packages using built-in yarn 4.x outdated command
-# The --json flag outputs a JSON array of outdated packages
+# Check for outdated packages using built-in yarn npm info command
+# This approach reads package.json and queries npm registry for each dependency
 echo -e "${YELLOW}Checking for outdated packages...${NC}"
-OUTDATED_JSON=$(yarn outdated --json 2>&1) || true
 
-# Parse the JSON output using Node.js
-# Yarn 4.x outputs: [{"name":"pkg","current":"1.0.0","latest":"2.0.0","type":"dependencies"}, ...]
-PARSED_PACKAGES=$(OUTDATED_JSON="$OUTDATED_JSON" node <<'NODE'
-const json = process.env.OUTDATED_JSON || '[]';
+PARSED_PACKAGES=$(node <<'NODE'
+const fs = require('fs');
+const { execSync } = require('child_process');
 
 try {
-  const packages = JSON.parse(json.trim());
+  const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  const dependencies = packageJson.dependencies || {};
+  const devDependencies = packageJson.devDependencies || {};
 
-  if (!Array.isArray(packages) || packages.length === 0) {
+  const allDeps = [
+    ...Object.entries(dependencies).map(([name, version]) => ({ name, version, type: 'dependencies' })),
+    ...Object.entries(devDependencies).map(([name, version]) => ({ name, version, type: 'devDependencies' }))
+  ];
+
+  if (allDeps.length === 0) {
     process.exit(0);
   }
 
-  const results = packages
-    .filter(pkg => pkg.name && pkg.latest && pkg.current !== pkg.latest)
-    .map(pkg => {
-      const name = pkg.name || '';
-      const current = pkg.current || 'unknown';
-      const latest = pkg.latest || 'unknown';
-      const type = pkg.type || 'dependencies';
-      return `${name}|${current}|${latest}|${type}`;
-    });
+  const outdated = [];
 
-  if (results.length > 0) {
-    process.stdout.write(results.join('\n'));
+  for (const dep of allDeps) {
+    try {
+      // Use yarn npm info to get latest version (built-in command)
+      const result = execSync(`yarn npm info ${dep.name} --fields version --json`, {
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+      const info = JSON.parse(result.trim());
+      const latestVersion = info.version;
+
+      // Clean current version (remove ^ ~ etc.)
+      const currentVersion = dep.version.replace(/^[\^~>=<]+/, '');
+
+      if (latestVersion && currentVersion !== latestVersion) {
+        outdated.push(`${dep.name}|${currentVersion}|${latestVersion}|${dep.type}`);
+      }
+    } catch (e) {
+      // Skip packages that fail to query (private packages, etc.)
+      continue;
+    }
+  }
+
+  if (outdated.length > 0) {
+    process.stdout.write(outdated.join('\n'));
   }
 } catch (e) {
-  // If JSON parsing fails, exit silently (no updates)
+  // If anything fails, exit silently (no updates)
   process.exit(0);
 }
 NODE
@@ -126,28 +145,22 @@ UPDATED_LIST=$(for pkg in "${OUTDATED_PACKAGES[@]}"; do
   echo "- ${NAME}: ${CURRENT_VERSION} → ${LATEST_VERSION} (${DEP_TYPE})"
 done)
 
-PR_BODY=$(cat <<'PR_BODY_EOF'
-## Package Updates
+PR_BODY="## Package Updates
 
 This PR updates the following npm packages:
 
 ### Changes to package.json
 
-```diff
-__PACKAGE_DIFF__
-```
+\`\`\`diff
+${PACKAGE_DIFF}
+\`\`\`
 
 ### Updated packages
 
-__UPDATED_LIST__
+${UPDATED_LIST}
 
 ---
-*Generated automatically by `bin/update-packages`*
-PR_BODY_EOF
-)
-
-PR_BODY="${PR_BODY/__PACKAGE_DIFF__/$PACKAGE_DIFF}"
-PR_BODY="${PR_BODY/__UPDATED_LIST__/$UPDATED_LIST}"
+*Generated automatically by \`bin/update-packages\`*"
 
 # Commit changes
 echo -e "${YELLOW}Committing changes...${NC}"
