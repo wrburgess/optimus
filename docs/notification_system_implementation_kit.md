@@ -1594,6 +1594,42 @@ def deliver_chat(item)
 end
 ```
 
+### CUSTOMIZE: Admin Navigation Links
+
+Add links to the notification resources in your admin navigation and dashboard so users can access them.
+
+#### Nav Bar
+
+If your app has an admin nav bar component, add a "Notifications" dropdown:
+
+```erb
+<%# Example: app/components/admin/nav_bar/component.html.erb %>
+<%= render Admin::NavItem::Component.new(title: "Notifications") do |nav_item| %>
+  <% nav_item.with_dropdown_item(resource: NotificationTopic, name: "Topics", path: admin_notification_topics_path) %>
+  <% nav_item.with_dropdown_item(resource: NotificationTemplate, name: "Templates", path: admin_notification_templates_path) %>
+  <% nav_item.with_dropdown_item(resource: NotificationSubscription, name: "Subscriptions", path: admin_notification_subscriptions_path) %>
+  <% nav_item.with_dropdown_item(resource: NotificationMessage, name: "Messages", path: admin_notification_messages_path) %>
+  <% nav_item.with_dropdown_item(resource: NotificationQueueItem, name: "Queue Items", path: admin_notification_queue_items_path) %>
+<% end %>
+```
+
+#### Dashboard
+
+If your app has an admin dashboard, add a "Notifications" card:
+
+```erb
+<%# Example: app/views/admin/dashboard/index.html.erb %>
+<%= render Admin::DashboardCard::Component.new(title: "Notifications") do |card| %>
+  <% card.with_link(name: "Topics", url: polymorphic_path([ :admin, NotificationTopic ]), policy: NotificationTopic) %>
+  <% card.with_link(name: "Templates", url: polymorphic_path([ :admin, NotificationTemplate ]), policy: NotificationTemplate) %>
+  <% card.with_link(name: "Subscriptions", url: polymorphic_path([ :admin, NotificationSubscription ]), policy: NotificationSubscription) %>
+  <% card.with_link(name: "Messages", url: polymorphic_path([ :admin, NotificationMessage ]), policy: NotificationMessage) %>
+  <% card.with_link(name: "Queue Items", url: polymorphic_path([ :admin, NotificationQueueItem ]), policy: NotificationQueueItem) %>
+<% end %>
+```
+
+**Note**: Adapt these examples to match your application's existing navigation patterns and components.
+
 ---
 
 ## Verification Checklist
