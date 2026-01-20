@@ -17,8 +17,8 @@ RSpec.describe NotificationSubscription, type: :model do
 
     it { is_expected.to validate_presence_of(:distribution_method) }
     it { is_expected.to validate_presence_of(:distribution_frequency) }
-    it { is_expected.to validate_inclusion_of(:distribution_method).in_array(NotificationDistributionMethods::METHODS) }
-    it { is_expected.to validate_inclusion_of(:distribution_frequency).in_array(NotificationDistributionFrequencies::FREQUENCIES) }
+    it { is_expected.to validate_inclusion_of(:distribution_method).in_array(NotificationDistributionMethods.all) }
+    it { is_expected.to validate_inclusion_of(:distribution_frequency).in_array(NotificationDistributionFrequencies.all) }
 
     it "validates uniqueness of distribution_method scoped to topic and user" do
       topic = create(:notification_topic)

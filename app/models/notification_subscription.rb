@@ -1,8 +1,8 @@
 class NotificationSubscription < ApplicationRecord
   include Archivable
   include Loggable
-  include NotificationDistributionMethods
-  include NotificationDistributionFrequencies
+  include HasDistributionMethod
+  include HasDistributionFrequency
 
   belongs_to :notification_topic
   belongs_to :user

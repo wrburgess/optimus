@@ -374,11 +374,15 @@ The `ProcessSummarizedNotificationsJob` runs hourly via GoodJob cron. Verify:
 - `app/models/notification_message.rb`
 - `app/models/notification_queue_item.rb`
 
+**Modules (Enumerables):**
+- `app/modules/notification_distribution_methods.rb` - Defines EMAIL, SMS, CHAT constants
+- `app/modules/notification_distribution_frequencies.rb` - Defines IMMEDIATE, SUMMARIZED_HOURLY, SUMMARIZED_DAILY constants
+
 **Concerns:**
 - `app/models/concerns/notifiable.rb` - Mixin for triggering notifications
 - `app/models/concerns/notification_template_renderer.rb` - ERB rendering
-- `app/models/concerns/notification_distribution_methods.rb` - Method enum
-- `app/models/concerns/notification_distribution_frequencies.rb` - Frequency enum
+- `app/models/concerns/has_distribution_method.rb` - Validates distribution_method field
+- `app/models/concerns/has_distribution_frequency.rb` - Validates distribution_frequency field with helper methods
 
 **Jobs:**
 - `app/jobs/notify_topic_job.rb`

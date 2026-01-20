@@ -1,7 +1,7 @@
 class NotificationTemplate < ApplicationRecord
   include Archivable
   include Loggable
-  include NotificationDistributionMethods
+  include HasDistributionMethod
 
   belongs_to :notification_topic
 

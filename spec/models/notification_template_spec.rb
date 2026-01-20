@@ -16,7 +16,7 @@ RSpec.describe NotificationTemplate, type: :model do
     it { is_expected.to validate_presence_of(:distribution_method) }
     it { is_expected.to validate_presence_of(:subject_template) }
     it { is_expected.to validate_presence_of(:body_template) }
-    it { is_expected.to validate_inclusion_of(:distribution_method).in_array(NotificationDistributionMethods::METHODS) }
+    it { is_expected.to validate_inclusion_of(:distribution_method).in_array(NotificationDistributionMethods.all) }
 
     it "validates uniqueness of distribution_method scoped to notification_topic_id" do
       topic = create(:notification_topic)

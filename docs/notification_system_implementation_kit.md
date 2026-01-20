@@ -162,79 +162,115 @@ After creating migrations, run: `bundle exec rails db:migrate`
 
 ---
 
-### Phase 2: Type Modules (Concerns)
+### Phase 2: Enumerable Modules and Concerns
 
-#### 2.1 NotificationDistributionMethods
+Enumerables are defined as plain Ruby modules in `app/modules/`. Concerns in `app/models/concerns/` reference these modules and provide validations and instance methods.
+
+#### 2.1 NotificationDistributionMethods (Module)
 
 ```ruby
-# app/models/concerns/notification_distribution_methods.rb
+# app/modules/notification_distribution_methods.rb
 module NotificationDistributionMethods
-  extend ActiveSupport::Concern
-
-  METHODS = %w[email sms chat].freeze
-
   EMAIL = "email".freeze
   SMS = "sms".freeze
   CHAT = "chat".freeze
 
+  def self.all
+    [
+      EMAIL,
+      SMS,
+      CHAT
+    ]
+  end
+
+  def self.options_for_select
+    all.map { |item| [ item.titleize, item ] }
+  end
+end
+```
+
+#### 2.2 HasDistributionMethod (Concern)
+
+```ruby
+# app/models/concerns/has_distribution_method.rb
+module HasDistributionMethod
+  extend ActiveSupport::Concern
+
   included do
-    validates :distribution_method, presence: true, inclusion: { in: METHODS }
+    validates :distribution_method, presence: true, inclusion: { in: NotificationDistributionMethods.all }
   end
 
   class_methods do
     def distribution_methods
-      METHODS
+      NotificationDistributionMethods.all
     end
 
     def distribution_methods_for_select
-      METHODS.map { |method| [ method.titleize, method ] }
+      NotificationDistributionMethods.options_for_select
     end
   end
 end
 ```
 
-#### 2.2 NotificationDistributionFrequencies
+#### 2.3 NotificationDistributionFrequencies (Module)
 
 ```ruby
-# app/models/concerns/notification_distribution_frequencies.rb
+# app/modules/notification_distribution_frequencies.rb
 module NotificationDistributionFrequencies
-  extend ActiveSupport::Concern
-
-  FREQUENCIES = %w[immediate summarized_hourly summarized_daily].freeze
-
   IMMEDIATE = "immediate".freeze
   SUMMARIZED_HOURLY = "summarized_hourly".freeze
   SUMMARIZED_DAILY = "summarized_daily".freeze
 
-  included do
-    validates :distribution_frequency, presence: true, inclusion: { in: FREQUENCIES }
+  def self.all
+    [
+      IMMEDIATE,
+      SUMMARIZED_HOURLY,
+      SUMMARIZED_DAILY
+    ]
   end
 
-  class_methods do
-    def distribution_frequencies
-      FREQUENCIES
-    end
-
-    def distribution_frequencies_for_select
-      FREQUENCIES.map { |freq| [ freq.titleize, freq ] }
-    end
-  end
-
-  def immediate?
-    distribution_frequency == IMMEDIATE
-  end
-
-  def summarized_hourly?
-    distribution_frequency == SUMMARIZED_HOURLY
-  end
-
-  def summarized_daily?
-    distribution_frequency == SUMMARIZED_DAILY
+  def self.options_for_select
+    all.map { |item| [ item.titleize, item ] }
   end
 end
 ```
 
-#### 2.3 NotificationTemplateRenderer
+#### 2.4 HasDistributionFrequency (Concern)
+
+```ruby
+# app/models/concerns/has_distribution_frequency.rb
+module HasDistributionFrequency
+  extend ActiveSupport::Concern
+
+  included do
+    validates :distribution_frequency, presence: true, inclusion: { in: NotificationDistributionFrequencies.all }
+  end
+
+  class_methods do
+    def distribution_frequencies
+      NotificationDistributionFrequencies.all
+    end
+
+    def distribution_frequencies_for_select
+      NotificationDistributionFrequencies.options_for_select
+    end
+  end
+
+  def immediate?
+    distribution_frequency == NotificationDistributionFrequencies::IMMEDIATE
+  end
+
+  def summarized_hourly?
+    distribution_frequency == NotificationDistributionFrequencies::SUMMARIZED_HOURLY
+  end
+
+  def summarized_daily?
+    distribution_frequency == NotificationDistributionFrequencies::SUMMARIZED_DAILY
+  end
+end
+```
+
+#### 2.5 NotificationTemplateRenderer
 
 ```ruby
 # app/models/concerns/notification_template_renderer.rb
@@ -386,7 +422,7 @@ end
 class NotificationTemplate < ApplicationRecord
   include Archivable
   include Loggable
-  include NotificationDistributionMethods
+  include HasDistributionMethod
 
   belongs_to :notification_topic
 
@@ -436,8 +472,8 @@ end
 class NotificationSubscription < ApplicationRecord
   include Archivable
   include Loggable
-  include NotificationDistributionMethods
-  include NotificationDistributionFrequencies
+  include HasDistributionMethod
+  include HasDistributionFrequency
 
   belongs_to :notification_topic
   belongs_to :user
@@ -539,7 +575,7 @@ end
 # app/models/notification_queue_item.rb
 class NotificationQueueItem < ApplicationRecord
   include Loggable
-  include NotificationDistributionMethods
+  include HasDistributionMethod
 
   belongs_to :notification_subscription
   belongs_to :notification_message
@@ -1675,7 +1711,8 @@ After implementation:
 |-----------|------|
 | Migrations | `db/migrate/TIMESTAMP_*.rb` |
 | Models | `app/models/notification_*.rb` |
-| Concerns | `app/models/concerns/notification_*.rb`, `app/models/concerns/notifiable.rb` |
+| Modules | `app/modules/notification_distribution_*.rb` |
+| Concerns | `app/models/concerns/has_distribution_*.rb`, `app/models/concerns/notifiable.rb`, `app/models/concerns/notification_template_renderer.rb` |
 | Jobs | `app/jobs/*_notification*_job.rb` |
 | Mailer | `app/mailers/notification_mailer.rb` |
 | Mailer Views | `app/views/notification_mailer/*.erb` |

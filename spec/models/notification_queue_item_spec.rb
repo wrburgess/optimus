@@ -15,7 +15,7 @@ RSpec.describe NotificationQueueItem, type: :model do
 
     it { is_expected.to validate_presence_of(:distribution_method) }
     it { is_expected.to validate_presence_of(:distribute_at) }
-    it { is_expected.to validate_inclusion_of(:distribution_method).in_array(NotificationDistributionMethods::METHODS) }
+    it { is_expected.to validate_inclusion_of(:distribution_method).in_array(NotificationDistributionMethods.all) }
   end
 
   describe "scopes" do

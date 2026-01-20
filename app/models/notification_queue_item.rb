@@ -1,6 +1,6 @@
 class NotificationQueueItem < ApplicationRecord
   include Loggable
-  include NotificationDistributionMethods
+  include HasDistributionMethod
 
   belongs_to :notification_subscription
   belongs_to :notification_message
