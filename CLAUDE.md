@@ -39,6 +39,18 @@ Replace `YOUR_CONTEXT7_API_KEY` with your Context7 API key. You can obtain one f
 
 Context7 provides up-to-date documentation and code examples for programming libraries, which helps Claude Code give accurate, current answers about dependencies used in this project.
 
+## Related Projects
+
+This repository serves as a Rails application template for the MPI Media application ecosystem. For cross-repository context, see `.claude/projects.json` which contains:
+
+- **optimus** (this repo) - Rails application template and pattern source
+- **avails** - Central data repository for MPI Media
+- **sfa** - Video clip hosting and search engine
+- **garden** - Static site generator for MPI sites
+- **harvest** - Public-facing transaction and ecommerce platform
+
+Each team member should create `.claude/projects.local.json` (gitignored) with their local paths to enable seamless cross-repo operations. See `.claude/projects.json` for GitHub URLs and project details.
+
 ## Commands
 
 ```bash

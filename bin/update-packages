@@ -31,76 +31,61 @@ else
   exit 1
 fi
 
-# Set yarn version to berry
-echo -e "${YELLOW}Setting yarn version to berry...${NC}"
-yarn set version berry
-
-# Check for outdated packages and capture output
+# Check for outdated packages using built-in yarn npm info command
+# This approach reads package.json and queries npm registry for each dependency
 echo -e "${YELLOW}Checking for outdated packages...${NC}"
-OUTDATED_JSON_PATH=$(mktemp)
-if ! yarn outdated --json >"$OUTDATED_JSON_PATH"; then
-  STATUS=$?
-  if [ $STATUS -ne 1 ]; then
-    echo -e "${RED}yarn outdated command failed with status ${STATUS}.${NC}"
-    rm -f "$OUTDATED_JSON_PATH"
-    exit ${STATUS}
-  fi
-fi
 
-cat "$OUTDATED_JSON_PATH"
-
-PARSED_PACKAGES=$(OUTDATED_JSON_PATH="$OUTDATED_JSON_PATH" node <<'NODE'
+PARSED_PACKAGES=$(node <<'NODE'
 const fs = require('fs');
-const path = process.env.OUTDATED_JSON_PATH;
-if (!path) process.exit(0);
-const raw = fs.existsSync(path) ? fs.readFileSync(path, 'utf8').trim() : '';
-if (!raw) process.exit(0);
+const { execSync } = require('child_process');
 
-const results = [];
+try {
+  const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  const dependencies = packageJson.dependencies || {};
+  const devDependencies = packageJson.devDependencies || {};
 
-function record(entry) {
-  if (!entry) return;
-  const name = entry.name || entry.package || entry[0];
-  const current = entry.current || entry[1];
-  const latest = entry.latest || entry[2];
-  const depType = entry.type || entry['package type'] || entry[3] || 'dependency';
-  if (!name || !latest || current === latest) return;
-  results.push([String(name), String(current), String(latest), String(depType)].join('|'));
-}
+  const allDeps = [
+    ...Object.entries(dependencies).map(([name, version]) => ({ name, version, type: 'dependencies' })),
+    ...Object.entries(devDependencies).map(([name, version]) => ({ name, version, type: 'devDependencies' }))
+  ];
 
-for (const line of raw.split(/\r?\n/)) {
-  if (!line.trim()) continue;
-  let parsed;
-  try {
-    parsed = JSON.parse(line);
-  } catch {
+  if (allDeps.length === 0) {
+    process.exit(0);
+  }
+
+  const outdated = [];
+
+  for (const dep of allDeps) {
     try {
-      parsed = JSON.parse(`[${line}]`);
-    } catch {
+      // Use yarn npm info to get latest version (built-in command)
+      const result = execSync(`yarn npm info ${dep.name} --fields version --json`, {
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+      const info = JSON.parse(result.trim());
+      const latestVersion = info.version;
+
+      // Clean current version (remove ^ ~ etc.)
+      const currentVersion = dep.version.replace(/^[\^~>=<]+/, '');
+
+      if (latestVersion && currentVersion !== latestVersion) {
+        outdated.push(`${dep.name}|${currentVersion}|${latestVersion}|${dep.type}`);
+      }
+    } catch (e) {
+      // Skip packages that fail to query (private packages, etc.)
       continue;
     }
   }
 
-  if (Array.isArray(parsed)) {
-    parsed.forEach(record);
-    continue;
+  if (outdated.length > 0) {
+    process.stdout.write(outdated.join('\n'));
   }
-
-  if (parsed && parsed.type === 'table' && parsed.data && Array.isArray(parsed.data.body)) {
-    parsed.data.body.forEach(record);
-    continue;
-  }
-
-  record(parsed);
-}
-
-if (results.length) {
-  process.stdout.write(results.join('\n'));
+} catch (e) {
+  // If anything fails, exit silently (no updates)
+  process.exit(0);
 }
 NODE
 )
-
-rm -f "$OUTDATED_JSON_PATH"
 
 if [ -z "$PARSED_PACKAGES" ]; then
   echo -e "${GREEN}✓ No package updates needed. All packages are up to date!${NC}"
@@ -160,28 +145,22 @@ UPDATED_LIST=$(for pkg in "${OUTDATED_PACKAGES[@]}"; do
   echo "- ${NAME}: ${CURRENT_VERSION} → ${LATEST_VERSION} (${DEP_TYPE})"
 done)
 
-PR_BODY=$(cat <<'PR_BODY_EOF'
-## Package Updates
+PR_BODY="## Package Updates
 
 This PR updates the following npm packages:
 
 ### Changes to package.json
 
-```diff
-__PACKAGE_DIFF__
-```
+\`\`\`diff
+${PACKAGE_DIFF}
+\`\`\`
 
 ### Updated packages
 
-__UPDATED_LIST__
+${UPDATED_LIST}
 
 ---
-*Generated automatically by `bin/update-packages-gha`*
-PR_BODY_EOF
-)
-
-PR_BODY="${PR_BODY/__PACKAGE_DIFF__/$PACKAGE_DIFF}"
-PR_BODY="${PR_BODY/__UPDATED_LIST__/$UPDATED_LIST}"
+*Generated automatically by \`bin/update-packages\`*"
 
 # Commit changes
 echo -e "${YELLOW}Committing changes...${NC}"
@@ -223,7 +202,7 @@ if [ "$CREATE_NEW_BRANCH" = true ]; then
         --body "$PR_BODY" \
         --base main \
         --head "$BRANCH_NAME"
-      
+
       echo -e "${GREEN}✓ Pull request created successfully!${NC}"
     else
       echo -e "${YELLOW}Skipping PR creation - authenticate gh or export GH_TOKEN.${NC}"
