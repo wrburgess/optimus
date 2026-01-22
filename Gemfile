@@ -55,7 +55,7 @@ group :development, :test do
   gem "bundler-audit", "0.9.3", require: false
   gem "debug", "1.11.1"
   gem "factory_bot_rails", "6.5.1"
-  gem "faker", "3.5.3"
+  gem "faker", "3.6.0"
   gem "rspec-rails", "8.0.2"
   gem "rubocop", "1.82.1"
   gem "rubocop-capybara", "2.22.1", require: false
