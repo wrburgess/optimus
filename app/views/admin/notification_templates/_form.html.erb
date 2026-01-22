@@ -18,9 +18,9 @@
           prompt: 'Select a method...',
           autocomplete: 'off',
           wrapper: :tom_select_label_inset %>
-      <%= f.input :active, as: :boolean, wrapper: :floating_label_form %>
-      <%= f.input :subject_template, wrapper: :floating_label_form, hint: "ERB template for email subject. Example: Hello &lt;%= user.name %&gt;" %>
-      <%= f.input :body_template, as: :text, wrapper: :floating_label_form, input_html: { rows: 10 }, hint: "ERB template for email body. Example: Hello &lt;%= user.name %&gt;" %>
+      <%= f.input :active, as: :boolean, wrapper: :custom_boolean_switch %>
+      <%= f.input :subject_template, wrapper: :floating_label_form, hint: "ERB template for email subject. Example: Hello <code>&lt;%= user.name %&gt;</code>".html_safe %>
+      <%= f.input :body_template, as: :text, wrapper: :floating_label_form, input_html: { rows: 10 }, hint: "ERB template for email body. Example: Hello <code>&lt;%= user.name %&gt;</code>".html_safe %>
     </div>
   </div>
   <div class="row">

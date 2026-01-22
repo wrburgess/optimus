@@ -1,5 +1,6 @@
 class SystemPermission < ApplicationRecord
   include Loggable
+  include Notifiable
 
   validates :name, presence: true
   validates :resource, presence: true

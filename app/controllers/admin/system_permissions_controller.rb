@@ -18,9 +18,16 @@ class Admin::SystemPermissionsController < AdminController
     instance = controller_class.create(create_params)
     instance.update_associations(params)
 
-    instance.log(user: current_user, operation: action_name, meta: params.to_json)
-    flash[:success] = "New #{instance.class_name_title} successfully created"
-    redirect_to polymorphic_path([ :admin, instance ])
+    if instance.persisted?
+      instance.log(user: current_user, operation: action_name, meta: params.to_json)
+      instance.notify_topic("system_permission.created", context: { system_permission: instance, created_by: current_user })
+      flash[:success] = "New #{instance.class_name_title} successfully created"
+      redirect_to polymorphic_path([ :admin, instance ])
+    else
+      @instance = instance
+      flash.now[:error] = instance.errors.full_messages.to_sentence
+      render :new, status: :unprocessable_entity
+    end
   end
 
   def edit
