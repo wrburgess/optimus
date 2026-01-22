@@ -13,7 +13,10 @@ class TomSelectInput < SimpleForm::Inputs::Base
         multiple:,
         autocomplete:,
         class: "tom-select",
-        data: { tom_select_target: "tomselect" }
+        data: {
+          controller: "tom-select",
+          tom_select_target: "tomselect"
+        }
       }.merge(merged_input_options)
     )
   end
