@@ -2,6 +2,114 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Permissions and Autonomy
+
+### Branch-Based Permissions
+
+**On feature branches (any branch except `main`):**
+- **FULL AUTONOMY GRANTED** - Proceed with all changes without asking "should I proceed" or similar permission questions
+- Make commits, edit files, refactor code, and implement features directly
+- Run tests and linting, fix issues, and commit fixes automatically
+- The only time to ask questions is for **requirement clarification** (what to build, not whether to proceed)
+- User will review changes via PR before merging to main
+
+**On `main` branch:**
+- Ask before making any changes
+- Require explicit user approval for commits
+
+### How to Check Current Branch
+
+Before starting work, check the branch:
+```bash
+git branch --show-current
+```
+
+If output is NOT `main`, proceed with full autonomy.
+
+## Commit and PR Documentation Standards
+
+**CRITICAL: All commits and PRs must have verbose, detailed documentation.**
+
+### Commit Message Format
+
+```
+Brief summary (50 chars or less)
+
+Detailed explanation of changes:
+- What was changed and why
+- Technical approach taken
+- Any architectural decisions made
+- Edge cases handled
+- Related files or systems affected
+
+Context for future contributors:
+- Why this approach was chosen over alternatives
+- Potential gotchas or areas to watch
+- Related issues, tickets, or discussions
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+### PR Description Format
+
+```markdown
+## Summary
+Detailed overview of what this PR accomplishes and why it was needed.
+
+## Changes Made
+- Bullet point list of specific changes
+- Include file paths and key modifications
+- Explain technical decisions
+
+## Technical Approach
+Detailed explanation of:
+- Design patterns used
+- Why this approach was chosen
+- Alternatives considered and why they were rejected
+- Any performance, security, or architectural considerations
+
+## Testing
+- What was tested and how
+- Edge cases covered
+- Any manual testing steps performed
+
+## Context for Future Contributors
+- Why this code exists
+- Common scenarios where this code will be modified
+- Gotchas or areas requiring careful attention
+- Related code or documentation to reference
+
+## Checklist
+- [ ] Tests pass (`bundle exec rspec`)
+- [ ] Linting passes (`bundle exec rubocop -a`)
+- [ ] Changes are documented in code comments where non-obvious
+- [ ] PR description provides sufficient context
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
+
+### Code Comment Standards
+
+Add detailed comments for:
+- Non-obvious logic or algorithms
+- Business rules or domain-specific requirements
+- Workarounds or temporary solutions
+- Integration points with external systems
+- Security considerations
+- Performance optimizations
+
+**Example:**
+```ruby
+# We use a background job here instead of inline processing because:
+# 1. PDF generation can take 30+ seconds for large reports
+# 2. Avoids request timeout issues in production
+# 3. Allows us to retry on failure without user intervention
+# Related: See PdfGenerationJob for retry strategy
+def generate_report
+  PdfGenerationJob.perform_later(report_id: id)
+end
+```
+
 ## Required Workflow
 
 **ALWAYS run these checks before committing or pushing:**
