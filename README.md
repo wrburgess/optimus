@@ -37,6 +37,10 @@ This repository is part of a multi-repo ecosystem (avails, sfa, garden, harvest,
 
 - See the [Dependency Management](docs/dependency_management.md) document
 
+## System Permissions
+
+- See the [System Permissions](docs/system_permissions.md) document for the authorization system
+
 ## Notification System
 
 - See the [Notification System](docs/notification_system.md) document
