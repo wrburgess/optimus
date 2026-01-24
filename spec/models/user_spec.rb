@@ -107,6 +107,29 @@ RSpec.describe User, type: :model do
     it "returns false when the user lacks the requested permission" do
       expect(user.access_authorized?(resource: "reports", operation: "edit")).to be(false)
     end
+
+    it "handles symbol arguments by converting to strings" do
+      expect(user.access_authorized?(resource: :reports, operation: :view)).to be(true)
+    end
+
+    it "memoizes permissions and only queries the database once" do
+      # Clear any cached data
+      user.reload
+
+      # Count queries during multiple access_authorized? calls
+      query_count = 0
+      counter = ->(*) { query_count += 1 }
+
+      ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+        # Multiple permission checks should only trigger one query
+        user.access_authorized?(resource: "reports", operation: "view")
+        user.access_authorized?(resource: "reports", operation: "edit")
+        user.access_authorized?(resource: "other", operation: "view")
+      end
+
+      # Should only have 1 query (the initial permissions load)
+      expect(query_count).to eq(1)
+    end
   end
 
   describe "#has_system_permission?" do

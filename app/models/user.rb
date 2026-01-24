@@ -56,11 +56,11 @@ class User < ApplicationRecord
   end
 
   def access_authorized?(resource:, operation:)
-    system_permissions.where(resource:, operation:).exists?
+    permissions_cache.include?([ resource.to_s, operation.to_s ])
   end
 
   def has_system_permission?
-    system_permissions.exists?
+    permissions_cache.any?
   end
 
   def name
@@ -81,5 +81,17 @@ class User < ApplicationRecord
 
   def full_name_and_email
     "#{first_name} #{last_name}".titleize.strip + " (#{email})"
+  end
+
+  private
+
+  # Memoizes all user permissions as a Set of [resource, operation] pairs.
+  # This reduces database queries from N (one per permission check) to 1
+  # (loading all permissions once per request). The cache is automatically
+  # cleared when Rails reloads the user object for the next request.
+  def permissions_cache
+    @permissions_cache ||= system_permissions
+                             .pluck(:resource, :operation)
+                             .to_set
   end
 end
