@@ -10,7 +10,7 @@
     "tom-select": "2.4.3"
   },
   "name": "optimus",
-  "repository": "git@github.com:wrburgess/optimus.git",
+  "repository": "git@github.com:mpimedia/optimus.git",
   "scripts": {
     "build": "node esbuild.config.js",
     "build:css": "sass ./app/assets/stylesheets/admin.scss:./app/assets/builds/admin.css ./app/assets/stylesheets/public.scss:./app/assets/builds/public.css --no-source-map --load-path=node_modules --style=compressed",

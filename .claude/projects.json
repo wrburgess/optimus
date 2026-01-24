@@ -35,8 +35,8 @@
     "optimus": {
       "name": "Optimus",
       "description": "Rails application template and pattern source",
-      "github_url": "https://github.com/wrburgess/optimus",
-      "github_org": "wrburgess",
+      "github_url": "https://github.com/mpimedia/optimus",
+      "github_org": "mpimedia",
       "github_repo": "optimus",
       "role": "template"
     }

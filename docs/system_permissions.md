@@ -4,7 +4,7 @@
 
 The Optimus System Permission system implements Role-Based Access Control (RBAC) using Pundit for authorization. It provides a flexible, hierarchical permission structure that controls access to admin resources throughout the application.
 
-**Related:** [PR #72 - Per-Request Permission Memoization](https://github.com/wrburgess/optimus/pull/72) optimized this system for performance.
+**Related:** [PR #72 - Per-Request Permission Memoization](https://github.com/mpimedia/optimus/pull/72) optimized this system for performance.
 
 ## Architecture
 

@@ -77,5 +77,5 @@
 
 ## Referenced Projects
 
-- `/wrburgess/optimus` - for patterns, examples, and conventions for features and projects
+- `/mpimedia/optimus` - for patterns, examples, and conventions for features and projects
 - `/basecamp/fizzy` - if no patterns or examples exist in optimus and you need inspiration
