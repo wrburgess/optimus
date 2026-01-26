@@ -50,7 +50,6 @@ Capybara.register_driver :selenium_with_long_timeout do |app|
 end
 
 RSpec.configure do |config|
-  config.include RSpec::Longrun::DSL
   config.before(:suite) { Warden.test_mode! }
   config.extend ControllerMacros, type: :component
   config.extend ControllerMacros, type: :controller
