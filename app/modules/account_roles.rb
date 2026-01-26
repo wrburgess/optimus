@@ -6,10 +6,10 @@ module AccountRoles
 
   def self.options_for_select
     [
-      [ self.ADMIN.titleize, self::ADMIN ],
-      [ self.USER.titleize, self::USER ],
-      [ self.MANAGER.titleize, self::MANAGER ],
-      [ self.BILLING.titleize, self::BILLING ]
+      [ self::ADMIN.titleize, self::ADMIN ],
+      [ self::USER.titleize, self::USER ],
+      [ self::MANAGER.titleize, self::MANAGER ],
+      [ self::BILLING.titleize, self::BILLING ]
     ]
   end
 
