@@ -37,7 +37,7 @@ gem "solid_cache", "1.0.10"
 gem "solid_queue", "1.3.1"
 gem "stimulus-rails", "1.3.4"
 gem "thruster", "0.1.17", require: false
-gem "turbo-rails", "2.0.21"
+gem "turbo-rails", "2.0.22"
 gem "view_component", "4.2.0"
 
 group :development, :staging do
