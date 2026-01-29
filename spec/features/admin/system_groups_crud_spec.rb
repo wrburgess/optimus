@@ -48,6 +48,7 @@ RSpec.describe "Admin System Groups CRUD", type: :feature do
       visit "/admin/system_groups/new"
 
       expect(page).to have_field("Name")
+      expect(page).to have_content("System Users")
       expect(page).to have_button("Submit")
     end
   end
@@ -59,6 +60,7 @@ RSpec.describe "Admin System Groups CRUD", type: :feature do
       visit "/admin/system_groups/#{target_group.id}/edit"
 
       expect(page).to have_field("Name", with: "Original Name")
+      expect(page).to have_content("System Users")
       expect(page).to have_button("Submit")
     end
   end

@@ -16,6 +16,14 @@
             autocomplete: 'off',
             multiple: true,
             wrapper: :tom_select_label_inset %>
+        <%= f.input :user_ids,
+            as: :tom_select,
+            collection: User.options_for_select,
+            label: 'System Users',
+            prompt: 'Select users...',
+            autocomplete: 'off',
+            multiple: true,
+            wrapper: :tom_select_label_inset %>
       </div>
     </div><!-- row -->
     <div class="row">
