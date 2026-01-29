@@ -1,0 +1,88 @@
+name: Feature Request
+description: Request a new feature for Optimus (CC-workflow compatible)
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request
+        Fill out this form to create a feature request. Structured fields help
+        Claude Code analyze and plan the implementation via `bin/cc-workflow`.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Brief description of the feature
+      placeholder: What should be built?
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements
+      description: Detailed requirements and acceptance criteria
+      placeholder: |
+        - [ ] Requirement 1
+        - [ ] Requirement 2
+        - [ ] Requirement 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User Story
+      description: Who is this for and why?
+      placeholder: "As a [role], I want [capability] so that [benefit]"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      description: Estimated scope of changes
+      options:
+        - Small (1-3 files)
+        - Medium (4-10 files)
+        - Large (10+ files)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Primary area affected
+      options:
+        - Admin UI
+        - API
+        - Models / Business Logic
+        - Background Jobs
+        - Notifications
+        - Authentication / Authorization
+        - Frontend (Stimulus/Turbo)
+        - Infrastructure / DevOps
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: Technical Notes
+      description: Any technical guidance, constraints, or references
+      placeholder: "Reference existing patterns, specific gems, DB considerations, etc."
+    validations:
+      required: false
+
+  - type: textarea
+    id: design-references
+    attributes:
+      label: Design References
+      description: Screenshots, mockups, or links to designs
+    validations:
+      required: false

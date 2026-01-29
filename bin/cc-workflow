@@ -1,0 +1,354 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Colors for output (matching existing bin/ script conventions)
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Maximum lines of diff to include in prompts to avoid exceeding context limits
+MAX_DIFF_LINES=500
+
+# ---------------------------------------------------------------------------
+# Usage
+# ---------------------------------------------------------------------------
+usage() {
+  echo -e "${BLUE}Usage: bin/cc-workflow <issue-number> <phase>${NC}"
+  echo ""
+  echo "Phases:"
+  echo "  plan       - Analyze issue, create branch, post implementation plan"
+  echo "  implement  - Implement changes, create PR, request Copilot review"
+  echo "  respond    - Review Copilot feedback, post response with recommendations"
+  echo "  revise     - Apply agreed-upon changes, push to PR"
+  echo ""
+  echo "Example:"
+  echo "  bin/cc-workflow 42 plan"
+  exit 1
+}
+
+# ---------------------------------------------------------------------------
+# Validation
+# ---------------------------------------------------------------------------
+
+# Require two arguments
+if [ $# -ne 2 ]; then
+  usage
+fi
+
+ISSUE_NUMBER="$1"
+PHASE="$2"
+
+# Validate issue number is a positive integer
+if ! [[ "$ISSUE_NUMBER" =~ ^[0-9]+$ ]]; then
+  echo -e "${RED}Error: Issue number must be a positive integer, got '${ISSUE_NUMBER}'${NC}"
+  exit 1
+fi
+
+# Validate phase
+case "$PHASE" in
+  plan|implement|respond|revise) ;;
+  *)
+    echo -e "${RED}Error: Invalid phase '${PHASE}'. Must be one of: plan, implement, respond, revise${NC}"
+    usage
+    ;;
+esac
+
+echo -e "${BLUE}=== CC Workflow: ${PHASE} phase for issue #${ISSUE_NUMBER} ===${NC}"
+
+# ---------------------------------------------------------------------------
+# Prerequisite checks
+# ---------------------------------------------------------------------------
+echo -e "${YELLOW}Checking prerequisites...${NC}"
+
+if ! command -v gh &> /dev/null; then
+  echo -e "${RED}Error: GitHub CLI (gh) is not installed. Install it from https://cli.github.com${NC}"
+  exit 1
+fi
+
+if ! gh auth status &> /dev/null; then
+  echo -e "${RED}Error: GitHub CLI is not authenticated. Run 'gh auth login' first.${NC}"
+  exit 1
+fi
+
+if ! command -v claude &> /dev/null; then
+  echo -e "${RED}Error: Claude CLI is not installed. Install it from https://claude.ai/code${NC}"
+  exit 1
+fi
+
+# Determine repo owner/name for API calls
+REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
+echo -e "${GREEN}✓ Prerequisites OK (repo: ${REPO})${NC}"
+
+# ---------------------------------------------------------------------------
+# Template loading
+# ---------------------------------------------------------------------------
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+TEMPLATE_PATH="${PROJECT_DIR}/.claude/commands/workflow-${PHASE}.md"
+
+if [ ! -f "$TEMPLATE_PATH" ]; then
+  echo -e "${RED}Error: Template not found at ${TEMPLATE_PATH}${NC}"
+  exit 1
+fi
+
+TEMPLATE=$(cat "$TEMPLATE_PATH")
+
+# ---------------------------------------------------------------------------
+# Helper: find PR for an issue by branch prefix
+# ---------------------------------------------------------------------------
+find_pr_for_issue() {
+  local issue_num="$1"
+  local pr_number=""
+
+  # Primary: search by branch prefix cc/<issue-number>
+  pr_number=$(gh pr list --state open --json number,headRefName --jq ".[] | select(.headRefName | startswith(\"cc/${issue_num}\")) | .number" 2>/dev/null | head -1)
+
+  # Fallback: search PRs that mention "Closes #N" or "#N"
+  if [ -z "$pr_number" ]; then
+    pr_number=$(gh pr list --state open --search "Closes #${issue_num}" --json number --jq '.[0].number' 2>/dev/null)
+  fi
+
+  # Fallback: search closed/merged PRs (in case it was just merged)
+  if [ -z "$pr_number" ]; then
+    pr_number=$(gh pr list --state all --json number,headRefName --jq ".[] | select(.headRefName | startswith(\"cc/${issue_num}\")) | .number" 2>/dev/null | head -1)
+  fi
+
+  echo "$pr_number"
+}
+
+# ---------------------------------------------------------------------------
+# Helper: find and checkout the cc branch for an issue
+# ---------------------------------------------------------------------------
+checkout_cc_branch() {
+  local issue_num="$1"
+
+  # Fetch latest remote branches
+  git fetch origin --prune
+
+  # Find branch matching cc/<issue-number>-*
+  local branch
+  branch=$(git branch -r --list "origin/cc/${issue_num}-*" | head -1 | sed 's|^[ *]*origin/||' | xargs)
+
+  if [ -z "$branch" ]; then
+    # Try local branches
+    branch=$(git branch --list "cc/${issue_num}-*" | head -1 | sed 's|^[ *]*||' | xargs)
+  fi
+
+  if [ -z "$branch" ]; then
+    echo -e "${RED}Error: No branch found matching cc/${issue_num}-*${NC}"
+    echo -e "${YELLOW}Run 'bin/cc-workflow ${issue_num} plan' first to create the branch.${NC}"
+    exit 1
+  fi
+
+  echo -e "${YELLOW}Checking out branch: ${branch}${NC}"
+
+  # Check out the branch (create local tracking branch if needed)
+  if git show-ref --verify --quiet "refs/heads/${branch}"; then
+    git checkout "$branch"
+    # Pull from origin only if the remote branch exists
+    if git ls-remote --exit-code --heads origin "$branch" &>/dev/null; then
+      git pull origin "$branch"
+    else
+      echo -e "${YELLOW}Branch exists locally but not on origin — skipping pull${NC}"
+    fi
+  else
+    git checkout -b "$branch" "origin/${branch}"
+  fi
+
+  echo -e "${GREEN}✓ On branch: ${branch}${NC}"
+}
+
+# ---------------------------------------------------------------------------
+# Helper: truncate text to max lines
+# ---------------------------------------------------------------------------
+truncate_output() {
+  local text="$1"
+  local max_lines="$2"
+  local line_count
+  line_count=$(echo "$text" | wc -l | xargs)
+
+  if [ "$line_count" -gt "$max_lines" ]; then
+    echo "$text" | head -n "$max_lines"
+    echo ""
+    echo "[... truncated: showing ${max_lines} of ${line_count} lines ...]"
+  else
+    echo "$text"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Phase: plan
+# ---------------------------------------------------------------------------
+run_plan() {
+  echo -e "${YELLOW}Fetching issue #${ISSUE_NUMBER}...${NC}"
+  ISSUE_DATA=$(gh issue view "$ISSUE_NUMBER" --json title,body,labels,assignees,milestone)
+  ISSUE_TITLE=$(echo "$ISSUE_DATA" | gh api --input - --jq '.title' 2>/dev/null || echo "$ISSUE_DATA" | python3 -c "import sys,json;print(json.load(sys.stdin)['title'])" 2>/dev/null || echo "Issue #${ISSUE_NUMBER}")
+
+  echo -e "${GREEN}✓ Fetched issue: ${ISSUE_TITLE}${NC}"
+
+  # Verify we're on main
+  CURRENT_BRANCH=$(git branch --show-current)
+  if [ "$CURRENT_BRANCH" != "main" ]; then
+    echo -e "${YELLOW}Warning: Not on main branch (on ${CURRENT_BRANCH}). The plan phase typically starts from main.${NC}"
+    echo -e "${YELLOW}Continuing anyway — Claude will create the cc/ branch.${NC}"
+  fi
+
+  # Build prompt
+  PROMPT="${TEMPLATE//\{\{ISSUE_NUMBER\}\}/${ISSUE_NUMBER}}"
+  PROMPT="${PROMPT//\{\{ISSUE_DATA\}\}/${ISSUE_DATA}}"
+
+  echo -e "${YELLOW}Launching Claude Code for plan phase...${NC}"
+  echo "$PROMPT" | claude -p --verbose --permission-mode acceptEdits
+  echo -e "${GREEN}=== Plan phase complete for issue #${ISSUE_NUMBER} ===${NC}"
+  echo -e "${BLUE}Next: Review the plan on https://github.com/${REPO}/issues/${ISSUE_NUMBER}${NC}"
+  echo -e "${BLUE}Then run: bin/cc-workflow ${ISSUE_NUMBER} implement${NC}"
+}
+
+# ---------------------------------------------------------------------------
+# Phase: implement
+# ---------------------------------------------------------------------------
+run_implement() {
+  echo -e "${YELLOW}Fetching issue #${ISSUE_NUMBER} and comments...${NC}"
+  ISSUE_DATA=$(gh issue view "$ISSUE_NUMBER" --json title,body,labels,assignees,milestone)
+  ISSUE_COMMENTS=$(gh issue view "$ISSUE_NUMBER" --json comments --jq '.comments[] | "### Comment by \(.author.login) at \(.createdAt)\n\(.body)\n---"')
+
+  echo -e "${GREEN}✓ Fetched issue data and comments${NC}"
+
+  # Checkout the cc branch
+  checkout_cc_branch "$ISSUE_NUMBER"
+
+  # Build prompt
+  PROMPT="${TEMPLATE//\{\{ISSUE_NUMBER\}\}/${ISSUE_NUMBER}}"
+  PROMPT="${PROMPT//\{\{ISSUE_DATA\}\}/${ISSUE_DATA}}"
+  PROMPT="${PROMPT//\{\{ISSUE_COMMENTS\}\}/${ISSUE_COMMENTS}}"
+
+  echo -e "${YELLOW}Launching Claude Code for implement phase...${NC}"
+  echo "$PROMPT" | claude -p --verbose --permission-mode acceptEdits
+  echo -e "${GREEN}=== Implement phase complete for issue #${ISSUE_NUMBER} ===${NC}"
+
+  # Find the PR that was just created and request Copilot review
+  PR_NUMBER=$(find_pr_for_issue "$ISSUE_NUMBER")
+  if [ -n "$PR_NUMBER" ]; then
+    echo -e "${BLUE}PR created: https://github.com/${REPO}/pull/${PR_NUMBER}${NC}"
+
+    echo -e "${YELLOW}Action required: Request Copilot review via the GitHub UI (Reviewers → Copilot)${NC}"
+    echo -e "${YELLOW}  Or enable automatic Copilot review in your org's Copilot settings${NC}"
+    echo -e "${BLUE}Next: After Copilot reviews, run: bin/cc-workflow ${ISSUE_NUMBER} respond${NC}"
+  else
+    echo -e "${YELLOW}No PR found — check if the PR was created successfully.${NC}"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Phase: respond
+# ---------------------------------------------------------------------------
+run_respond() {
+  echo -e "${YELLOW}Finding PR for issue #${ISSUE_NUMBER}...${NC}"
+  PR_NUMBER=$(find_pr_for_issue "$ISSUE_NUMBER")
+
+  if [ -z "$PR_NUMBER" ]; then
+    echo -e "${RED}Error: No open PR found for issue #${ISSUE_NUMBER}${NC}"
+    echo -e "${YELLOW}Run 'bin/cc-workflow ${ISSUE_NUMBER} implement' first.${NC}"
+    exit 1
+  fi
+
+  echo -e "${GREEN}✓ Found PR #${PR_NUMBER}${NC}"
+
+  echo -e "${YELLOW}Fetching PR reviews and diff...${NC}"
+
+  # Fetch review comments (both review-level and inline)
+  PR_REVIEWS=$(gh api "repos/${REPO}/pulls/${PR_NUMBER}/reviews" 2>/dev/null || echo "[]")
+  PR_REVIEW_COMMENTS=$(gh api "repos/${REPO}/pulls/${PR_NUMBER}/comments" 2>/dev/null || echo "[]")
+  PR_COMMENTS=$(gh pr view "$PR_NUMBER" --json comments --jq '.comments[] | "### Comment by \(.author.login) at \(.createdAt)\n\(.body)\n---"' 2>/dev/null || echo "No comments")
+
+  # Fetch PR diff (truncated)
+  PR_DIFF_RAW=$(gh pr diff "$PR_NUMBER" 2>/dev/null || echo "Unable to fetch diff")
+  PR_DIFF=$(truncate_output "$PR_DIFF_RAW" "$MAX_DIFF_LINES")
+
+  # Combine review data into readable format
+  ALL_REVIEWS="## Review Decisions
+${PR_REVIEWS}
+
+## Inline Review Comments
+${PR_REVIEW_COMMENTS}
+
+## PR Conversation Comments
+${PR_COMMENTS}"
+
+  echo -e "${GREEN}✓ Fetched review data${NC}"
+
+  # Build prompt
+  PROMPT="${TEMPLATE//\{\{ISSUE_NUMBER\}\}/${ISSUE_NUMBER}}"
+  PROMPT="${PROMPT//\{\{PR_NUMBER\}\}/${PR_NUMBER}}"
+  PROMPT="${PROMPT//\{\{PR_REVIEWS\}\}/${ALL_REVIEWS}}"
+  PROMPT="${PROMPT//\{\{PR_DIFF\}\}/${PR_DIFF}}"
+
+  echo -e "${YELLOW}Launching Claude Code for respond phase...${NC}"
+  echo "$PROMPT" | claude -p --verbose --permission-mode acceptEdits
+  echo -e "${GREEN}=== Respond phase complete for PR #${PR_NUMBER} ===${NC}"
+  echo -e "${BLUE}Response posted: https://github.com/${REPO}/pull/${PR_NUMBER}${NC}"
+  echo -e "${BLUE}Next: Review the response, leave instructions, then run: bin/cc-workflow ${ISSUE_NUMBER} revise${NC}"
+}
+
+# ---------------------------------------------------------------------------
+# Phase: revise
+# ---------------------------------------------------------------------------
+run_revise() {
+  echo -e "${YELLOW}Finding PR for issue #${ISSUE_NUMBER}...${NC}"
+  PR_NUMBER=$(find_pr_for_issue "$ISSUE_NUMBER")
+
+  if [ -z "$PR_NUMBER" ]; then
+    echo -e "${RED}Error: No PR found for issue #${ISSUE_NUMBER}${NC}"
+    exit 1
+  fi
+
+  echo -e "${GREEN}✓ Found PR #${PR_NUMBER}${NC}"
+
+  echo -e "${YELLOW}Fetching PR and issue data...${NC}"
+
+  # Fetch all comments and feedback
+  PR_COMMENTS_RAW=$(gh pr view "$PR_NUMBER" --json comments --jq '.comments[] | "### Comment by \(.author.login) at \(.createdAt)\n\(.body)\n---"' 2>/dev/null || echo "No comments")
+  PR_REVIEW_COMMENTS=$(gh api "repos/${REPO}/pulls/${PR_NUMBER}/comments" 2>/dev/null || echo "[]")
+  ISSUE_COMMENTS=$(gh issue view "$ISSUE_NUMBER" --json comments --jq '.comments[] | "### Comment by \(.author.login) at \(.createdAt)\n\(.body)\n---"' 2>/dev/null || echo "No comments")
+
+  # Combine PR feedback
+  PR_COMMENTS="## PR Conversation Comments
+${PR_COMMENTS_RAW}
+
+## Inline Review Comments
+${PR_REVIEW_COMMENTS}"
+
+  # Fetch PR diff (truncated)
+  PR_DIFF_RAW=$(gh pr diff "$PR_NUMBER" 2>/dev/null || echo "Unable to fetch diff")
+  PR_DIFF=$(truncate_output "$PR_DIFF_RAW" "$MAX_DIFF_LINES")
+
+  echo -e "${GREEN}✓ Fetched all feedback data${NC}"
+
+  # Checkout the cc branch
+  checkout_cc_branch "$ISSUE_NUMBER"
+
+  # Build prompt
+  PROMPT="${TEMPLATE//\{\{ISSUE_NUMBER\}\}/${ISSUE_NUMBER}}"
+  PROMPT="${PROMPT//\{\{PR_NUMBER\}\}/${PR_NUMBER}}"
+  PROMPT="${PROMPT//\{\{PR_COMMENTS\}\}/${PR_COMMENTS}}"
+  PROMPT="${PROMPT//\{\{ISSUE_COMMENTS\}\}/${ISSUE_COMMENTS}}"
+  PROMPT="${PROMPT//\{\{PR_DIFF\}\}/${PR_DIFF}}"
+
+  echo -e "${YELLOW}Launching Claude Code for revise phase...${NC}"
+  echo "$PROMPT" | claude -p --verbose --permission-mode acceptEdits
+  echo -e "${GREEN}=== Revise phase complete for PR #${PR_NUMBER} ===${NC}"
+  echo -e "${BLUE}PR updated: https://github.com/${REPO}/pull/${PR_NUMBER}${NC}"
+}
+
+# ---------------------------------------------------------------------------
+# Dispatch to phase handler
+# ---------------------------------------------------------------------------
+case "$PHASE" in
+  plan)      run_plan ;;
+  implement) run_implement ;;
+  respond)   run_respond ;;
+  revise)    run_revise ;;
+esac

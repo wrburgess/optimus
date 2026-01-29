@@ -6,7 +6,8 @@
       "Bash(gh workflow:*)",
       "Bash(gh workflow view:*)",
       "Bash(gh pr:*)",
-      "Bash(gh issue:*)"
+      "Bash(gh issue:*)",
+      "Bash(gh api:*)"
     ]
   },
   "hooks": {
