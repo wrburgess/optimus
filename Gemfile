@@ -14,7 +14,7 @@ gem "cssbundling-rails", "1.4.3"
 gem "csv", "3.3.5"
 gem "devise", "5.0.0"
 gem "foreman", "0.90.0"
-gem "good_job", "4.13.1"
+gem "good_job", "4.13.2"
 gem "image_processing", "1.14.0"
 gem "importmap-rails", "2.2.3"
 gem "jbuilder", "2.14.1"
@@ -46,7 +46,7 @@ group :development, :staging do
 end
 
 group :development do
-  gem "brakeman", "7.1.2", require: false
+  gem "brakeman", "8.0.1", require: false
   gem "bullet", "8.1.0"
   gem "web-console", "4.2.1"
 end
