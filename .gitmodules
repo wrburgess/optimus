@@ -1,3 +1,0 @@
-[submodule ".mpi-standards"]
-	path = .mpi-standards
-	url = https://github.com/mpimedia/mpi-application-standards.git
