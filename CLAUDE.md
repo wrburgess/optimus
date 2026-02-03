@@ -279,6 +279,7 @@ The `docs/` directory contains detailed guides:
 - `docs/standards/design.md` — UI/UX patterns, component conventions, Hotwire usage
 - `docs/standards/style.md` — Ruby, CSS, JS, ERB style and naming conventions
 - `docs/standards/hc-review-checklist.md` — What human reviewers should check that agents miss
+- `docs/standards/cross-repo-sync.md` — Shared vs project-specific standards, sync process
 
 **Architecture:**
 - `docs/architecture/overview.md` — Full architecture overview
