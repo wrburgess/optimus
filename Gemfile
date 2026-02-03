@@ -36,7 +36,7 @@ gem "solid_cable", "3.0.12"
 gem "solid_cache", "1.0.10"
 gem "solid_queue", "1.3.1"
 gem "stimulus-rails", "1.3.4"
-gem "thruster", "0.1.17", require: false
+gem "thruster", "0.1.18", require: false
 gem "turbo-rails", "2.0.23"
 gem "view_component", "4.2.0"
 
@@ -57,7 +57,7 @@ group :development, :test do
   gem "factory_bot_rails", "6.5.1"
   gem "faker", "3.6.0"
   gem "rspec-rails", "8.0.2"
-  gem "rubocop", "1.84.0"
+  gem "rubocop", "1.84.1"
   gem "rubocop-capybara", "2.22.1", require: false
   gem "rubocop-factory_bot", "2.28.0", require: false
   gem "rubocop-rails-omakase", require: false
