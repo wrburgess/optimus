@@ -132,6 +132,23 @@ Detailed overview of what this PR accomplishes and why it was needed.
 - [ ] Changes are documented in code comments where non-obvious
 ```
 
+## Agent Attribution (Required — No Exceptions)
+
+Every AI agent (Claude, Copilot, Codex, or any other) **must** include attribution on every piece of work it produces. This is non-negotiable.
+
+- **Commits** — Include `Co-Authored-By` trailer with the agent's name and model:
+  ```
+  Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+  Co-Authored-By: GitHub Copilot <noreply@github.com>
+  Co-Authored-By: OpenAI Codex <noreply@openai.com>
+  ```
+- **Pull Requests** — Include the agent's name in the PR description footer (e.g., `Generated with [Claude Code](https://claude.com/claude-code)`)
+- **Issue Comments** — Include a brief attribution line (e.g., `— Claude Code (Opus 4.5)`)
+- **PR Review Comments** — Include attribution in each review comment or summary
+- **Code Comments** — When an agent adds non-trivial inline comments, no attribution needed in the comment itself (the commit attribution covers it)
+
+If multiple agents contribute to the same commit, include a `Co-Authored-By` line for each.
+
 ## Architecture
 
 ### Authorization System

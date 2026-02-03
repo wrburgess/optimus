@@ -344,6 +344,14 @@ Use conventional commits:
 - `test:` - Testing
 - `refactor:` - Code refactoring
 
+### Agent Attribution (Required — No Exceptions)
+
+Every AI agent **must** include attribution on all work it produces:
+- **Commits**: `Co-Authored-By: GitHub Copilot <noreply@github.com>` (or the appropriate agent name/model)
+- **PRs**: Agent name in the PR description footer
+- **Issue/PR Comments**: Brief attribution line (e.g., `— GitHub Copilot`)
+- If multiple agents contribute, include a `Co-Authored-By` line for each.
+
 ### Code Review Checklist
 - [ ] Tests pass (`bundle exec rspec`)
 - [ ] Linting passes (`bundle exec rubocop`)
