@@ -271,7 +271,19 @@ See `docs/notification_system.md` and `docs/notification_system_agent_guide.md` 
 ## Documentation
 
 The `docs/` directory contains detailed guides:
+
+**Standards:**
+- `docs/standards/testing.md` — Testing standards, spec structure, factory conventions
+- `docs/standards/code-review.md` — Code review checklist for all reviewers (HC, CC, CDX)
+- `docs/standards/documentation.md` — When and where to write docs
+- `docs/standards/design.md` — UI/UX patterns, component conventions, Hotwire usage
+- `docs/standards/style.md` — Ruby, CSS, JS, ERB style and naming conventions
+- `docs/standards/hc-review-checklist.md` — What human reviewers should check that agents miss
+
+**Architecture:**
 - `docs/architecture/overview.md` — Full architecture overview
+
+**System Guides:**
 - `docs/system_permissions.md` — Authorization system
 - `docs/system_permissions_agent_guide.md` — Agent guide for permissions
 - `docs/notification_system.md` — Notification system
