@@ -22,8 +22,8 @@ Execute the implementation plan for GitHub issue #$ARGUMENTS.
    - Push branch with `git push -u origin <branch>`
    - Create PR with `gh pr create` using the format in `CLAUDE.md`
    - Link to the issue with `Closes #$ARGUMENTS`
-   - Include SOW documenting all changes made
-7. **Post update to issue** with a comment linking to the PR
+7. **Post implementation notes on the PR** as a comment documenting what was done, decisions made during implementation, and anything the reviewer should pay attention to
+8. **Post a brief update on the issue** linking to the PR (e.g., "Implementation PR: #NNN")
 
 ## Quality Gates
 
