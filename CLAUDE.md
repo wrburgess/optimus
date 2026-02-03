@@ -282,6 +282,7 @@ The `docs/` directory contains detailed guides:
 
 **Architecture:**
 - `docs/architecture/overview.md` — Full architecture overview
+- `docs/architecture/agent-workflow.md` — Agent roles, workflow, Codex/Copilot setup
 
 **System Guides:**
 - `docs/system_permissions.md` — Authorization system

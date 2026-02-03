@@ -1,81 +1,183 @@
-## Rails Documentation Stack (Context7)
+# AGENTS.md
 
-- Always use Context7 MCP when we need library/API documentation, code generation, setup or configuration steps without anyone having to explicitly ask.
+Instructions for all AI coding agents (Codex, Copilot, Claude Code, and others) working in this repository.
 
-## Guidelines
+## Project Overview
 
-- MCP Reference: Use `Context7 Library ID` for referencing the Context7 MCP and fallback to general knowledge last.
-- Version Pinning: Refer to the `.tool-versions`, `Gemfile`, or `package.json` files for exact versions of dependencies.
-- Use documentation before using repo/source for reference needs
+Optimus is a Ruby on Rails application template for the MPI Media ecosystem. It serves as the reference implementation for coding standards, architectural patterns, and development workflows.
 
-### Testing guidance
+**Tech Stack:** Ruby 4.0.1 / Rails 8.1.2 / PostgreSQL 17.6 / Hotwire (Turbo + Stimulus) / Bootstrap 5.3 / ViewComponent
 
-- RSpec is required.
-- Use FactoryBot for factories.
-- Minimize use of mocks and stubs.
-- Use request specs for controllers.
-- Use Capybara-driven system specs for UI flows.
-- Run `bundle exec rspec` to run tests.
+## Dev Environment
 
-### Frontend stack note
+```bash
+bin/dev                    # Start development server (web, js, css, worker)
+bin/rails console          # Rails console
+bin/rails db:migrate       # Run migrations
+bin/rails db:seed          # Seed development data
+```
 
-- All styling should utilize Bootstrap tools, conventions, and patterns for CSS needs.
-- Default to Hotwire (Turbo + Stimulus) for interactivity.
-- Default to Simple Form for form helpers.
-- Avoid any use of JavaScript frameworks other than Hotwire + Stimulus + Turbo.
+## Testing Instructions
 
-### AuthZ/AuthN defaults
+```bash
+bundle exec rspec                              # All tests
+bundle exec rspec spec/models/user_spec.rb     # Single file
+bundle exec rspec spec/models/user_spec.rb:42  # Single line
+bundle exec rspec spec/models/                 # Directory
+```
 
-- Use Devise for auth and Pundit for authorization with a reminder to check their docs when touching auth-related code.
-- We use a more specific SystemPermission, SystemRole, SystemGroup, Account, User model hierarchy with Pundit for AuthZ.
+- RSpec with FactoryBot (never fixtures)
+- Request specs for controllers (not controller specs)
+- Shoulda-matchers for validations and associations
+- Minimize mocks and stubs — use real objects
+- See `docs/standards/testing.md` for full conventions
 
-### Linting/formatting
+## Linting
 
-- Check your work to follow any Rubocop linting rules as inherited or specified in `/.rubocop.yml`.
-- Run `bundle exec rubocop` in the terminal to check for linting issues.
-- Autocorrect when necessary.
+```bash
+bundle exec rubocop        # Check all files
+bundle exec rubocop -a     # Auto-correct
+```
 
-## MCP Query Strategy
+Uses **rubocop-rails-omakase** with `rubocop-rspec`, `rubocop-capybara`, `rubocop-factory_bot` plugins.
 
-- MCP example: Query `/websites/guides_rubyonrails_v8_0` for Rails docs; use the same pattern for other Library IDs; fall back to general knowledge only if absent.
-- Always check the Rails and then Ruby docs first.
-- Query additional libraries based on the topic.
+## Security Scanning
 
-## Core Libraries (Query in Priority Order)
+```bash
+bin/brakeman               # Static analysis
+bin/bundler-audit           # Vulnerable dependencies
+```
 
-- Note: Items below refer to the Context7 Library ID and Library Description
+## Pre-Commit Requirements
 
-1. `/websites/guides_rubyonrails_v8_0` - Rails framework documentation
-1. `/websites/ruby-lang_en` - Ruby language documentation
-1. `/websites/postgresql_17` - PostgreSQL documentation
-1. `/hotwired/turbo-rails` - Turbo/Hotwire
-1. `/hotwired/stimulus-rails` - Stimulus JS documentation
-1. `/websites/getbootstrap_5_3` - Bootstrap documentation
-1. `/rspec/rspec-rails` - Testing documentation
-1. `/rails/rails` - Ruby on Rails framework
-1. `/ruby/ruby` - Ruby language repo
-1. `/postgres/postgres` - PostgreSQL database repo
-1. `/viewcomponent/view_component` - Rails erb components repo
-1. `/rubocop/rubocop` - Linting documentation
-1. `/rails/propshaft` - Asset Pipeline management
+**All of these must pass before committing:**
 
-## Additional Libraries (Query as Needed)
+1. `bundle exec rubocop -a` — zero offenses
+2. `bundle exec rspec` — zero failures
 
-- `/websites/betterspecs` - Testing recommendations and tips
-- `/heartcombo/devise` - Authentication
-- `/varvet/pundit` - Authorization
-- `/heartcombo/simple_form` - Form builder
-- `/faker-ruby/faker` - Faker gem documentation
-- `/bensheldon/good_job` - Async job management
-- `/caxlsx/caxlsx` - Excel document library
-- `/shopify/maintenance_tasks` - Maintenance Task library
-- `/activerecord-hackery/ransack` - Search enhancement library
-- `/websites/stripe` - Payments library
-- `/thoughtbot/factory_bot_rails` - Factory management for specs
-- `/teamcapybara/capybara` - Browser based testing library
-- `/puma/puma` - Web server library
+No exceptions.
 
-## Referenced Projects
+## PR Instructions
 
-- `/mpimedia/optimus` - for patterns, examples, and conventions for features and projects
-- `/basecamp/fizzy` - if no patterns or examples exist in optimus and you need inspiration
+- PR title: under 70 characters, descriptive
+- PR body: Summary, Changes Made, Technical Approach, Testing, Checklist
+- Link to issue: `Closes #NNN` or `Part of #NNN`
+- Agent attribution required (see below)
+
+## Review Guidelines
+
+When reviewing code, check for:
+
+### P0 — Must Fix
+- Security vulnerabilities (SQL injection, XSS, missing authorization)
+- Missing `authorize` call in admin controller actions
+- Broken tests or tests that don't test what they claim
+- Credentials or secrets in code
+- Data loss risks (irreversible migrations, missing `dependent:`)
+
+### P1 — Should Fix
+- N+1 queries (use `includes` / `eager_load`)
+- Missing validations for required business constraints
+- Pattern violations (see Architecture section below)
+- Missing tests for new functionality
+- Ransack attributes exposing sensitive fields
+
+### P2 — Consider
+- Naming improvements
+- Code organization suggestions
+- Performance optimizations
+- Additional edge case coverage
+
+## Architecture
+
+### Authorization
+
+```
+User → SystemGroups → SystemRoles → SystemPermissions
+```
+
+- Pundit policies inherit from `AdminApplicationPolicy`
+- Every admin action must call `authorize`
+- Permissions checked via `user.access_authorized?(resource:, operation:)`
+- Operations defined in `app/modules/system_operations.rb`
+
+### Controllers
+
+- `AdminController` base: authenticated, authorized, Pagy pagination, layout "admin"
+- `ApiController` base: JWT auth, JSON default, `/api/v1/`
+- Use `controller_class` helper (not hard-coded class names)
+- Redirects use `polymorphic_path([:admin, instance])`
+- Soft delete via `archive` (never hard destroy on archivable records)
+- Every mutation logged via `.log(user:, operation:, meta:, original_data:)`
+
+### Models
+
+- Include concerns: `Archivable` (soft delete), `Loggable` (audit trail), `Notifiable` (events)
+- Enumerable constants: module in `app/modules/` + concern in `app/models/concerns/`
+- Define `ransackable_attributes` and `ransackable_associations` for security
+- Provide `self.options_for_select` for form dropdowns
+
+### Views & Components
+
+- ViewComponents in `app/components/admin/` (directory-per-component pattern)
+- Forms: tom-select for selects (`wrapper: :tom_select_label_inset`), floating labels for text (`wrapper: :floating_label_form`)
+- Bootstrap 5.3 for all styling
+- Hotwire (Turbo + Stimulus) for interactivity — no other JS frameworks
+
+### Background Jobs
+
+- GoodJob (Postgres-backed, no Redis)
+- Notification pipeline: `NotifyTopicJob` → `ProcessImmediateNotificationsJob` → `DistributeNotificationJob`
+- Audit logging: `CreateDataLogJob`
+
+## Agent Attribution (Required — No Exceptions)
+
+Every AI agent **must** include attribution on all work:
+
+- **Commits**: `Co-Authored-By: Agent Name <email>` trailer
+- **PRs**: Agent name in description footer
+- **Comments**: Attribution line (e.g., `— Codex (GPT-5.2)` or `— Claude Code (Opus 4.5)`)
+
+If multiple agents contribute, include a `Co-Authored-By` line for each.
+
+## Standards Documents
+
+Detailed standards are in `docs/standards/`:
+- `docs/standards/testing.md` — Test conventions and spec structure
+- `docs/standards/code-review.md` — Review checklist for all reviewers
+- `docs/standards/design.md` — UI/UX patterns and component conventions
+- `docs/standards/style.md` — Naming conventions and formatting rules
+- `docs/standards/documentation.md` — When and where to write docs
+- `docs/standards/hc-review-checklist.md` — Human reviewer checklist
+
+## Context7 MCP Query Strategy (Claude Code)
+
+This section is for Claude Code agents with Context7 MCP configured.
+
+- Always use Context7 MCP for library documentation before falling back to general knowledge
+- Refer to `.tool-versions`, `Gemfile`, and `package.json` for exact dependency versions
+
+### Core Libraries (Query in Priority Order)
+
+1. `/websites/guides_rubyonrails_v8_0` — Rails framework
+2. `/websites/ruby-lang_en` — Ruby language
+3. `/websites/postgresql_17` — PostgreSQL
+4. `/hotwired/turbo-rails` — Turbo/Hotwire
+5. `/hotwired/stimulus-rails` — Stimulus JS
+6. `/websites/getbootstrap_5_3` — Bootstrap
+7. `/rspec/rspec-rails` — Testing
+8. `/viewcomponent/view_component` — ViewComponent
+9. `/rubocop/rubocop` — Linting
+
+### Additional Libraries (Query as Needed)
+
+- `/heartcombo/devise` — Authentication
+- `/varvet/pundit` — Authorization
+- `/heartcombo/simple_form` — Form builder
+- `/faker-ruby/faker` — Test data
+- `/bensheldon/good_job` — Async jobs
+- `/caxlsx/caxlsx` — Excel exports
+- `/shopify/maintenance_tasks` — Maintenance tasks
+- `/activerecord-hackery/ransack` — Search
+- `/thoughtbot/factory_bot_rails` — Factories
+- `/teamcapybara/capybara` — Browser testing
