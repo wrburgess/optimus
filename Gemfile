@@ -46,7 +46,7 @@ group :development, :staging do
 end
 
 group :development do
-  gem "brakeman", "8.0.1", require: false
+  gem "brakeman", "8.0.2", require: false
   gem "bullet", "8.1.0"
   gem "web-console", "4.2.1"
 end
