@@ -13,7 +13,7 @@ This document is the single source of truth for how MPI Media's shared infrastru
 
 ## Repository Map
 
-MPI's shared infrastructure lives across three repositories. Each has a distinct, non-overlapping purpose.
+MPI's shared infrastructure lives across four repositories (three active, one deprecated). Each has a distinct, non-overlapping purpose.
 
 ### `mpimedia/optimus` (this repo)
 
@@ -162,7 +162,7 @@ The shared `settings.json` applies automatically. Create `settings.local.json` f
 
 ### .claude/commands/ (Skills)
 
-19 workflow command templates organized into three phases:
+11 workflow command templates organized into three phases:
 
 **Research Phase:**
 
