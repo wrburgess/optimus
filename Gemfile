@@ -33,6 +33,7 @@ gem "ransack", "4.4.1"
 gem "roo", "3.0.0"
 gem "simple_form", "5.4.1"
 gem "solid_cable", "3.0.12"
+gem "strong_migrations", "2.3.0"
 gem "solid_cache", "1.0.10"
 gem "solid_queue", "1.3.1"
 gem "stimulus-rails", "1.3.4"
@@ -67,6 +68,7 @@ end
 
 group :test do
   gem "capybara", "3.40.0"
+  gem "simplecov", "0.22.0", require: false
   gem "database_cleaner-active_record", "2.2.2"
   gem "rspec-github", "3.0.0"
   gem "rspec-json_expectations", "2.2.0"

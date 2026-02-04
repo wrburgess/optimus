@@ -7,6 +7,20 @@
 - Capybara for feature/system tests
 - WebMock to prevent accidental external HTTP calls
 - VCR for recording HTTP cassettes
+- SimpleCov for test coverage enforcement
+
+## Test Coverage Requirements
+
+SimpleCov enforces minimum coverage thresholds with a ratchet-up approach:
+
+- **Baseline minimum** — set to the current coverage level (started at 66% line coverage)
+- **Coverage drop refused** — coverage cannot decrease between runs, enforcing a one-way ratchet toward the 90% target
+- **Branch coverage enabled** — both branches of conditionals must be tested
+- **Target: 90% line coverage** — raise the `minimum_coverage` in `spec/spec_helper.rb` as coverage improves
+
+Coverage reports are generated at `coverage/index.html` after each `bundle exec rspec` run. The `coverage/` directory is gitignored.
+
+If coverage drops below the current threshold, add tests for the uncovered code before committing. Periodically raise `minimum_coverage` in `spec/spec_helper.rb` as the codebase approaches the 90% target.
 
 ## Spec Types and When to Use
 
@@ -208,6 +222,17 @@ Use shared examples from `spec/support/shared_examples/`:
 - Test flash messages: `expect(flash[:success]).to be_present`
 - Test redirects: `expect(response).to have_http_status(:redirect)`
 - Minimize mocks — use real objects when possible
+
+## Migration Safety
+
+`strong_migrations` automatically checks new migrations for unsafe operations. Common blocked patterns:
+
+- Adding a column with a default value on a large table (use a two-step process instead)
+- Removing a column without `safety_assured` (verify no code references remain)
+- Renaming a table or column (use a new table/column + backfill instead)
+- Adding a non-concurrent index (use `algorithm: :concurrently` in production)
+
+When a migration is blocked, follow the safe alternative in the error message. Use `safety_assured { }` only after confirming the operation is safe for existing production data.
 
 ## HC Review Checklist for Tests
 

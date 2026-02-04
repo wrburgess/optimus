@@ -54,14 +54,24 @@ bin/kamal deploy
 
 ## Required Workflow
 
-**ALWAYS run linting and tests before committing or pushing.**
+**ALWAYS run linting, tests, and security checks before committing or pushing.**
 
 ```bash
 bundle exec rubocop -a
 bundle exec rspec
+bin/brakeman --no-pager -q
+bin/bundler-audit check
 ```
 
-Both must pass before any `git commit` or `git push`. No exceptions.
+All four must pass before any `git commit` or `git push`. No exceptions.
+
+### Test Coverage
+
+SimpleCov enforces coverage with a ratchet-up approach — coverage cannot drop below the current baseline (target: 90%). Coverage drops from previous runs are refused. Run `bundle exec rspec` and check the `coverage/index.html` report if coverage is below threshold.
+
+### Migration Safety
+
+`strong_migrations` blocks unsafe migration operations (adding columns with defaults on large tables, removing columns without `safety_assured`, renaming tables, etc.). If a migration is flagged, follow the suggested safe alternative in the error message. Use `safety_assured { }` only when you've verified the operation is safe for production data.
 
 ## Permissions and Autonomy
 
@@ -283,6 +293,8 @@ See `docs/notification_system.md` and `docs/notification_system_agent_guide.md` 
 - **Pagy** — Pagination
 - **maintenance_tasks** — Data maintenance scripts
 - **caxlsx_rails** — Excel exports
+- **SimpleCov** — Test coverage enforcement (90% minimum)
+- **strong_migrations** — Migration safety checks
 
 ## Documentation
 
