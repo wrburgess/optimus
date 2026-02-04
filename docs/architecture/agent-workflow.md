@@ -1,14 +1,13 @@
 # Agent Workflow Architecture
 
-This document describes how AI agents (Claude Code, Codex, Copilot) interact in the MPI development workflow.
+This document describes how AI agents (Claude Code, Copilot) interact in the MPI development workflow.
 
 ## Agent Roles
 
 | Agent | Role | Trigger |
 |-------|------|---------|
 | **Claude Code (CC)** | Primary development agent — analyzes issues, plans, implements, creates PRs | Human invokes via CLI commands |
-| **Codex (CDX)** | Automated PR reviewer — reviews code for P0/P1/P2 issues | Automatic on PR creation, or `@codex review` comment |
-| **Copilot** | Inline code assistance and suggestions | IDE integration, or PR review via GitHub settings |
+| **GitHub Copilot** | Automated PR reviewer and inline code assistant | Automatic on PR creation via repository settings, or IDE integration |
 
 ## Workflow
 
@@ -33,10 +32,10 @@ This document describes how AI agents (Claude Code, Codex, Copilot) interact in 
    ├── Creates PR with implementation notes
    └── Posts brief link on Issue
         │
-7. Codex auto-reviews the PR
+7. Copilot auto-reviews the PR
    └── Posts code review with P0/P1/P2 findings
         │
-8. CC reads Codex review (/project:rtr NNN)
+8. CC reads Copilot review (/project:rtr NNN)
    ├── Categorizes comments
    ├── Proposes resolutions
    └── Presents options to HC
@@ -64,20 +63,20 @@ This document describes how AI agents (Claude Code, Codex, Copilot) interact in 
 | File | Agent | Purpose |
 |------|-------|---------|
 | `CLAUDE.md` | Claude Code | Primary instructions, patterns, commands, architecture |
-| `AGENTS.md` | Codex, all agents | Universal agent instructions, review guidelines, architecture |
+| `AGENTS.md` | All agents | Universal agent instructions, review guidelines, architecture |
 | `.github/copilot-instructions.md` | GitHub Copilot | Copilot-specific instructions and patterns |
 | `.claude/settings.json` | Claude Code | Permissions, hooks configuration |
 | `.claude/commands/*.md` | Claude Code | Reusable workflow command templates |
 
 ## Review Severity Levels
 
-Codex uses severity levels defined in `AGENTS.md`:
+Automated reviewers use severity levels defined in `AGENTS.md`:
 
 - **P0 — Must Fix**: Security vulnerabilities, missing authorization, broken tests, credentials in code, data loss risks
 - **P1 — Should Fix**: N+1 queries, missing validations, pattern violations, missing tests, exposed Ransack attributes
 - **P2 — Consider**: Naming, organization, performance, edge cases
 
-By default, Codex flags P0 and P1 issues. Adjust sensitivity in the `AGENTS.md` Review Guidelines section.
+Copilot flags issues based on `.github/copilot-instructions.md` and the severity definitions in `AGENTS.md`.
 
 ## Agent Attribution
 
@@ -86,48 +85,42 @@ Every agent must include attribution on all work. This is enforced by `CLAUDE.md
 ```
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 Co-Authored-By: GitHub Copilot <noreply@github.com>
-Co-Authored-By: OpenAI Codex <noreply@openai.com>
 ```
 
-## Codex Setup
+## GitHub Copilot Code Review Setup
 
 ### Prerequisites
 
-- OpenAI account with Codex access (ChatGPT Plus, Pro, Business, Edu, or Enterprise)
-- Repository accessible to Codex (GitHub integration enabled)
+- GitHub Copilot enabled for the repository (requires a Copilot Business or Enterprise plan, or individual Pro plan)
+- `.github/copilot-instructions.md` committed to the repository with project-specific guidance
 
-### Enable Codex PR Review
+### Enable Automatic PR Review
 
-1. Navigate to Codex settings (via ChatGPT or OpenAI dashboard)
-2. Connect the GitHub repository
-3. Toggle **Code review** ON for the repository
-4. Enable **Automatic reviews** to review every new PR
-5. Optionally enable **Review new pushes** for re-review on force pushes
+1. Go to repository **Settings → Copilot → Code review**
+2. Enable **automatic code review** for pull requests
+3. Copilot reads `.github/copilot-instructions.md` for project-specific patterns and review criteria
 
 ### Manual Review Trigger
 
-Comment on any PR to trigger a Codex review:
+Request a Copilot review on any PR through the GitHub UI:
 
+1. Open the PR on GitHub
+2. Click **Reviewers** in the sidebar
+3. Select **Copilot** from the reviewer list
+
+Or use the GitHub CLI:
+
+```bash
+gh pr edit NNN --add-reviewer copilot
 ```
-@codex review
-```
 
-With specific focus:
+### What Copilot Reviews
 
-```
-@codex review for security vulnerabilities
-@codex review for N+1 queries and performance
-```
+Copilot evaluates PRs against:
 
-### GitHub Copilot Code Review (Alternative)
-
-GitHub Copilot can also review PRs natively:
-
-1. Go to repository Settings → Copilot → Code review
-2. Enable automatic code review
-3. Copilot reads `.github/copilot-instructions.md` for project-specific guidance
-
-Both Codex and Copilot can be enabled simultaneously — they review independently.
+- `.github/copilot-instructions.md` — project-specific patterns, architecture, conventions
+- General code quality — security, performance, correctness
+- The severity levels defined in `AGENTS.md` (P0/P1/P2)
 
 ## Multi-Agent Patterns
 
@@ -165,7 +158,7 @@ When a plan calls for parallel agents, use the `/project:orch NNN` command to ge
    ├── Full test suite runs on integrated code
    └── Single PR created from integration branch
         │
-6. Normal review flow continues (Codex review → rtr → final)
+6. Normal review flow continues (Copilot review → rtr → final)
 ```
 
 ### File Ownership Rules
@@ -209,3 +202,25 @@ Agents coordinate through:
 | `/project:research/compare-standards REPO` | `/project:compare REPO` | Diff standards against another repo |
 | `/project:dep-review NNN` | — | Review Dependabot/dependency update PR |
 | `/project:db-health` | — | Run database health diagnostics |
+
+### Command Aliases
+
+Abbreviated commands (e.g., `/project:revi`) are **identical copies** of their full-path versions (e.g., `/project:research/review-issue`). Both forms are interchangeable — use abbreviations for daily work and full paths when referencing commands in documentation.
+
+The top-level files in `.claude/commands/` are aliases:
+
+| Alias | Full Path |
+|-------|-----------|
+| `revi.md` | `research/review-issue.md` |
+| `explore.md` | `research/explore-codebase.md` |
+| `compare.md` | `research/compare-standards.md` |
+| `cplan.md` | `plan/create-plan.md` |
+| `esti.md` | `plan/estimate-agents.md` |
+| `orch.md` | `plan/orchestrate.md` |
+| `impl.md` | `execute/implement.md` |
+| `rtr.md` | `execute/respond-to-review.md` |
+| `final.md` | `execute/finalize-pr.md` |
+
+`dep-review.md` and `db-health.md` are standalone utility commands with no subdirectory equivalent.
+
+When updating a command, **update both the alias and the full-path version** to keep them in sync.

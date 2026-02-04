@@ -340,9 +340,48 @@ See `.claude/projects.json` for the MPI Media ecosystem:
 
 Create `.claude/projects.local.json` (gitignored) with local paths for cross-repo operations.
 
+## CI Workflows
+
+All GitHub Actions workflows use shared reusable workflows from `mpimedia/mpi-application-workflows`, pinned to a specific commit SHA for stability:
+
+| Workflow | Shared Workflow | Purpose |
+|----------|----------------|---------|
+| `ci.yml` | `ci-rails.yml` | Run tests, linting, security checks on every push |
+| `update-gems.yml` | `update-gems.yml` | Daily gem updates via PR |
+| `update-packages.yml` | `update-packages.yml` | Daily package updates via PR |
+| `check_indexes.yml` | `check-indexes.yml` | Check for missing indexes on migration changes |
+
+**Pinned SHA:** `f00663fa9e97a7dafa18b276a6e483094116b98e`
+
+To update the shared workflows to a newer version:
+1. Review changes in `mpimedia/mpi-application-workflows` since the pinned SHA
+2. Update the SHA in all 4 workflow files simultaneously
+3. Test by running the CI workflow on a feature branch before merging
+
+## Claude Code Settings
+
+Claude Code uses two settings files in `.claude/`:
+
+| File | Checked In | Purpose |
+|------|-----------|---------|
+| `.claude/settings.json` | Yes | Shared team settings — minimal permissions, hooks (branch protection) |
+| `.claude/settings.local.json` | No (gitignored) | Personal settings — full permissions, MCP server access, local preferences |
+
+**`settings.json`** contains only what the team agrees on:
+- Allowed `gh` CLI commands (issues, PRs, workflows)
+- PreToolUse hooks (branch protection via `enforce-branch-creation.sh`)
+
+**`settings.local.json`** contains your personal configuration:
+- Extended Bash permissions for development tools
+- MCP server enablement (`enableAllProjectMcpServers`, `enabledMcpjsonServers`)
+- WebSearch and other tool permissions
+- Any overrides for your workflow
+
+To set up after cloning, create `.claude/settings.local.json` with your preferred permissions. The shared `settings.json` applies automatically.
+
 ## MCP Configuration
 
-After cloning, create `.mcp.json` (gitignored) in the project root:
+After cloning, copy `.mcp.json.example` to `.mcp.json` (gitignored) and fill in your API keys:
 
 ```json
 {
@@ -370,6 +409,12 @@ After cloning, create `.mcp.json` (gitignored) in the project root:
     }
   }
 }
+```
+
+A `.mcp.json.example` template is provided in the repo root. Copy it and replace the placeholder values:
+
+```bash
+cp .mcp.json.example .mcp.json
 ```
 
 - **Context7** — Up-to-date library documentation. Get an API key from [Context7](https://context7.com).

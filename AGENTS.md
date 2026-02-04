@@ -148,7 +148,7 @@ Every AI agent **must** include attribution on all work:
 
 - **Commits**: `Co-Authored-By: Agent Name <email>` trailer
 - **PRs**: Agent name in description footer
-- **Comments**: Attribution line (e.g., `— Codex (GPT-5.2)` or `— Claude Code (Opus 4.5)`)
+- **Comments**: Attribution line (e.g., `— Claude Code (Opus 4.5)` or `— GitHub Copilot`)
 
 If multiple agents contribute, include a `Co-Authored-By` line for each.
 

@@ -7,5 +7,5 @@ on:
 
 jobs:
   update:
-    uses: mpimedia/mpi-application-workflows/.github/workflows/update-packages.yml@main
+    uses: mpimedia/mpi-application-workflows/.github/workflows/update-packages.yml@f00663fa9e97a7dafa18b276a6e483094116b98e # pin to known-good SHA
     secrets: inherit
