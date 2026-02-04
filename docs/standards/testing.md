@@ -8,6 +8,27 @@
 - WebMock to prevent accidental external HTTP calls
 - VCR for recording HTTP cassettes
 - SimpleCov for test coverage enforcement
+- Bullet for N+1 query detection (raises in test, alerts in development)
+
+## N+1 Query Detection (Bullet)
+
+Bullet is configured to **log warnings in the test environment** when N+1 queries are detected. Each test starts and stops a Bullet request cycle (configured in `rails_helper.rb`).
+
+- In test: N+1 warnings are logged to `log/bullet.log` and the Rails logger
+- In development: Bullet shows browser alerts, console warnings, and a page footer
+- **Goal:** Once existing N+1 queries are resolved, enable `Bullet.raise = true` in `config/environments/test.rb` to fail tests on new N+1 queries
+
+**When Bullet detects a N+1 in tests:**
+1. Add `includes`, `eager_load`, or `preload` to the query causing the N+1
+2. If the N+1 is intentional (e.g., testing individual record loading), add to `Bullet.add_safelist` in an initializer
+3. Never disable Bullet globally to work around a detection
+4. New code must not introduce N+1 queries — agents should check `log/bullet.log` after running specs
+
+**Development mode features:**
+- Browser alert popup on N+1 detection
+- Console log message with the offending query
+- Footer added to every page showing Bullet status
+- Log file at `log/bullet.log`
 
 ## Test Coverage Requirements
 

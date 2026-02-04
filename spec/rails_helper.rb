@@ -51,6 +51,12 @@ end
 
 RSpec.configure do |config|
   config.before(:suite) { Warden.test_mode! }
+
+  # Bullet — N+1 query detection per test
+  if Bullet.enable?
+    config.before { Bullet.start_request }
+    config.after { Bullet.end_request }
+  end
   config.extend ControllerMacros, type: :component
   config.extend ControllerMacros, type: :controller
   config.extend ControllerMacros, type: :request
