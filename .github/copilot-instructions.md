@@ -563,6 +563,10 @@ end
 - `docs/credentials_management.md` - Managing credentials
 - `docs/dependency_management.md` - Dependency updates
 - `docs/asset_pipeline.md` - Frontend asset management
+- `docs/deployment.md` - Kamal deployment configuration and procedures
+- `docs/standards/hotwire-patterns.md` - Turbo Frames, Streams, Stimulus patterns
+- `docs/standards/caching.md` - Fragment caching, Russian doll, SolidCache
+- `docs/standards/query-patterns.md` - ActiveRecord query optimization
 
 ### External Documentation
 When working on specific gems/libraries, reference:
