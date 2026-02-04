@@ -102,7 +102,14 @@ bin/kamal rollback
 
 ## Pre-Deploy Hooks
 
-The `.kamal/hooks/pre-deploy` script gates deployments on GitHub CI status:
+Kamal provides sample hooks in `.kamal/hooks/`. To enable a hook, copy the sample to the non-suffixed filename:
+
+```bash
+cp .kamal/hooks/pre-deploy.sample .kamal/hooks/pre-deploy
+chmod +x .kamal/hooks/pre-deploy
+```
+
+The `pre-deploy` sample script gates deployments on GitHub CI status:
 
 1. Fetches the latest commit SHA
 2. Checks GitHub Actions status via the API (uses Octokit)

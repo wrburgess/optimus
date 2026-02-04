@@ -267,11 +267,11 @@ When Turbo replaces DOM content, Stimulus controllers automatically `disconnect`
 
   <%= f.input :name, wrapper: :floating_label_form, input_html: { required: true } %>
 
-  <%= f.input :category_id,
+  <%= f.input :notification_topic_id,
       as: :tom_select,
-      collection: Category.options_for_select,
-      label: "Category",
-      prompt: "Select a category...",
+      collection: NotificationTopic.options_for_select,
+      label: "Notification topic",
+      prompt: "Select a notification topic...",
       autocomplete: "off",
       wrapper: :tom_select_label_inset %>
 
@@ -297,7 +297,7 @@ def create
 end
 ```
 
-The `status: :unprocessable_entity` (422) is required for Turbo to render the response instead of following a redirect.
+The `status: :unprocessable_entity` (422) marks this as a validation failure, so Turbo doesn't treat it as a successful non-GET submission that must redirect and instead renders the response body (the form with errors).
 
 ### Disabling Turbo for Specific Forms
 

@@ -27,7 +27,7 @@ Use these directly when you need explicit control:
 
 ```ruby
 # preload — two queries, no join
-User.preload(:system_groups).where(active: true)
+User.preload(:system_groups).actives
 
 # eager_load — single query with LEFT JOIN
 User.eager_load(:system_groups).where(system_groups: { name: "Admins" })
@@ -36,8 +36,8 @@ User.eager_load(:system_groups).where(system_groups: { name: "Admins" })
 ### Nested Eager Loading
 
 ```ruby
-# Load topic → templates → subscriptions in one pass
-NotificationTopic.includes(notification_templates: :notification_subscriptions)
+# Load topics with templates and subscriptions in one pass
+NotificationTopic.includes(:notification_templates, :notification_subscriptions)
 ```
 
 ## Selecting Specific Columns
@@ -46,7 +46,7 @@ NotificationTopic.includes(notification_templates: :notification_subscriptions)
 
 ```ruby
 # Only load columns needed for the view
-User.select(:id, :first_name, :last_name, :email).where(active: true)
+User.select(:id, :first_name, :last_name, :email).actives
 ```
 
 ### `pluck` — Returns Raw Arrays
@@ -58,7 +58,7 @@ Use `pluck` when you don't need model instances — it skips ActiveRecord object
 permissions = user.system_permissions.pluck(:resource, :operation)
 
 # For select options
-Category.actives.order(:name).pluck(:name, :id)
+NotificationTopic.select_order.pluck(:name, :id)
 ```
 
 **Rule:** Use `pluck` for data extraction. Use `select` when you need to call model methods on the results.
@@ -178,18 +178,19 @@ scope :immediate, -> {
 }
 
 # Or using merge for cleaner cross-model scope composition
-scope :immediate, -> {
-  joins(:notification_subscription).merge(NotificationSubscription.immediate)
+# (merge reuses scopes defined on the joined model)
+scope :for_active_subscriptions, -> {
+  joins(:notification_subscription).merge(NotificationSubscription.active)
 }
 ```
 
 ### Default Sort
 
-Every model defines a default sort used by Ransack:
+Most models define a `default_sort` class method used by Ransack. The return value is an array of sort directives:
 
 ```ruby
 def self.default_sort
-  "name asc"
+  [ name: :asc, created_at: :desc ]
 end
 ```
 
@@ -307,9 +308,11 @@ sql = %(
 # BAD — SQL injection risk
 sql = "SELECT * FROM users WHERE name = '#{params[:name]}'"
 
-# GOOD — parameterized
-sql = "SELECT * FROM users WHERE name = $1"
-ActiveRecord::Base.connection.select_all(sql, "User Query", [[nil, params[:name]]])
+# GOOD — parameterized (using sanitize_sql_array)
+sql = ActiveRecord::Base.sanitize_sql_array(
+  ["SELECT * FROM users WHERE name = ?", params[:name]]
+)
+ActiveRecord::Base.connection.exec_query(sql)
 
 # GOOD — use ActiveRecord for anything with user input
 User.where(name: params[:name])
