@@ -206,10 +206,47 @@ bin/setup                     # Bundle install, db:prepare, assets, clear
 
 ### 2. Runtime versions
 
-Install [asdf](https://asdf-vm.com/) or [mise](https://mise.jdx.dev/), then:
+Install [mise](https://mise.jdx.dev/) to manage Ruby, Node, PostgreSQL, and Yarn versions.
+
+**Install mise:**
 
 ```bash
-asdf install                  # Installs Ruby, Node, PostgreSQL, Yarn from .tool-versions
+# macOS (Homebrew)
+brew install mise
+
+# Activate mise (add to ~/.zshrc or ~/.bashrc)
+eval "$(mise activate zsh)"   # or bash
+```
+
+**Install project runtimes:**
+
+```bash
+# Install all runtimes defined in .tool-versions
+mise install
+
+# Or install individually
+mise install ruby@4.0.1
+mise install node@25.5.0
+mise install postgres@17.6
+mise install yarn@4.12.0
+```
+
+**Verify versions:**
+
+```bash
+mise current                  # Show all active versions
+ruby --version                # ruby 4.0.1
+node --version                # v25.5.0
+pg_config --version           # PostgreSQL 17.6
+yarn --version                # 4.12.0
+```
+
+**Useful mise commands:**
+
+```bash
+mise list                     # Show all installed versions
+mise outdated                 # Check for newer versions
+mise use ruby@4.0.1           # Set version in .tool-versions
 ```
 
 ### 3. Claude Code setup
