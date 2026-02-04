@@ -102,9 +102,9 @@ This repo previously held shared Claude Code instructions (`CLAUDE.base.md`, `CL
 | Project | Repo | Role | Tech |
 |---------|------|------|------|
 | **Optimus** | `mpimedia/optimus` | Template and standards source | Rails, PostgreSQL, Hotwire |
-| **Avails** | `mpimedia/avails` | Central data repository | Rails, PostgreSQL |
+| **Avails** | `mpimedia/avails` | Central data repository | Rails, PostgreSQL, Elasticsearch |
 | **SFA** | `mpimedia/wpa_film_library` | Video clip hosting and search | Rails, PostgreSQL, Elasticsearch |
-| **Garden** | `mpimedia/garden` | Static site generator | Rails |
+| **Garden** | `mpimedia/garden` | Static site generator | Rails, PostgreSQL |
 | **Harvest** | `mpimedia/harvest` | Ecommerce platform | Rails, PostgreSQL |
 
 All Rails applications follow the same directory structure for AC configuration, documented in `docs/standards/cross-repo-sync.md`.
