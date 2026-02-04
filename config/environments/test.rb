@@ -53,4 +53,13 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Bullet — N+1 query detection
+  # Logs warnings to log/bullet.log and Rails logger.
+  # Set Bullet.raise = true once existing N+1 queries are resolved.
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.bullet_logger = true
+    Bullet.rails_logger = true
+  end
 end

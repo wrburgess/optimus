@@ -206,3 +206,6 @@ Agents coordinate through:
 | `/project:execute/respond-to-review NNN` | `/project:rtr NNN` | Read and respond to review |
 | `/project:execute/finalize-pr NNN` | `/project:final NNN` | Post SOW, prepare for merge |
 | `/project:plan/orchestrate NNN` | `/project:orch NNN` | Design multi-agent orchestration |
+| `/project:research/compare-standards REPO` | `/project:compare REPO` | Diff standards against another repo |
+| `/project:dep-review NNN` | — | Review Dependabot/dependency update PR |
+| `/project:db-health` | — | Run database health diagnostics |

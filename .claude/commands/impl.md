@@ -15,6 +15,8 @@ Execute the implementation plan for GitHub issue #$ARGUMENTS.
    ```bash
    bundle exec rubocop -a
    bundle exec rspec
+   bin/brakeman --no-pager -q
+   bin/bundler-audit check
    ```
    Fix any failures before proceeding.
 5. **Commit with detailed message** following the format in `CLAUDE.md`
@@ -30,6 +32,8 @@ Execute the implementation plan for GitHub issue #$ARGUMENTS.
 Do NOT create the PR until:
 - [ ] `bundle exec rubocop -a` passes with no offenses
 - [ ] `bundle exec rspec` passes with no failures
+- [ ] `bin/brakeman --no-pager -q` passes with no new warnings
+- [ ] `bin/bundler-audit check` passes with no vulnerabilities
 - [ ] All planned tasks are complete
 - [ ] Commit message follows CLAUDE.md format
 - [ ] PR description includes Summary, Changes, Technical Approach, Testing, and Checklist sections

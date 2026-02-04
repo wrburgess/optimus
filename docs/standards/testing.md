@@ -7,6 +7,41 @@
 - Capybara for feature/system tests
 - WebMock to prevent accidental external HTTP calls
 - VCR for recording HTTP cassettes
+- SimpleCov for test coverage enforcement
+- Bullet for N+1 query detection (raises in test, alerts in development)
+
+## N+1 Query Detection (Bullet)
+
+Bullet is configured to **log warnings in the test environment** when N+1 queries are detected. Each test starts and stops a Bullet request cycle (configured in `rails_helper.rb`).
+
+- In test: N+1 warnings are logged to `log/bullet.log` and the Rails logger
+- In development: Bullet shows browser alerts, console warnings, and a page footer
+- **Goal:** Once existing N+1 queries are resolved, enable `Bullet.raise = true` in `config/environments/test.rb` to fail tests on new N+1 queries
+
+**When Bullet detects a N+1 in tests:**
+1. Add `includes`, `eager_load`, or `preload` to the query causing the N+1
+2. If the N+1 is intentional (e.g., testing individual record loading), add to `Bullet.add_safelist` in an initializer
+3. Never disable Bullet globally to work around a detection
+4. New code must not introduce N+1 queries — agents should check `log/bullet.log` after running specs
+
+**Development mode features:**
+- Browser alert popup on N+1 detection
+- Console log message with the offending query
+- Footer added to every page showing Bullet status
+- Log file at `log/bullet.log`
+
+## Test Coverage Requirements
+
+SimpleCov enforces minimum coverage thresholds with a ratchet-up approach:
+
+- **Baseline minimum** — set to the current coverage level (started at 66% line coverage)
+- **Coverage drop refused** — coverage cannot decrease between runs, enforcing a one-way ratchet toward the 90% target
+- **Branch coverage enabled** — both branches of conditionals must be tested
+- **Target: 90% line coverage** — raise the `minimum_coverage` in `spec/spec_helper.rb` as coverage improves
+
+Coverage reports are generated at `coverage/index.html` after each `bundle exec rspec` run. The `coverage/` directory is gitignored.
+
+If coverage drops below the current threshold, add tests for the uncovered code before committing. Periodically raise `minimum_coverage` in `spec/spec_helper.rb` as the codebase approaches the 90% target.
 
 ## Spec Types and When to Use
 
@@ -208,6 +243,17 @@ Use shared examples from `spec/support/shared_examples/`:
 - Test flash messages: `expect(flash[:success]).to be_present`
 - Test redirects: `expect(response).to have_http_status(:redirect)`
 - Minimize mocks — use real objects when possible
+
+## Migration Safety
+
+`strong_migrations` automatically checks new migrations for unsafe operations. Common blocked patterns:
+
+- Adding a column with a default value on a large table (use a two-step process instead)
+- Removing a column without `safety_assured` (verify no code references remain)
+- Renaming a table or column (use a new table/column + backfill instead)
+- Adding a non-concurrent index (use `algorithm: :concurrently` in production)
+
+When a migration is blocked, follow the safe alternative in the error message. Use `safety_assured { }` only after confirming the operation is safe for existing production data.
 
 ## HC Review Checklist for Tests
 

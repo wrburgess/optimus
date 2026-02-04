@@ -4,11 +4,12 @@ These standards apply to all reviewers: Human Contributors (HC), Claude Code (CC
 
 ## Automated Checks (Must Pass)
 
-Before any review begins, these must pass:
+Before any review begins, all four must pass:
 
 - `bundle exec rubocop -a` — zero offenses
-- `bundle exec rspec` — zero failures
-- `bin/brakeman` — no new warnings
+- `bundle exec rspec` — zero failures, coverage above baseline minimum (currently 66%, ratcheting toward 90%)
+- `bin/brakeman --no-pager -q` — no new warnings
+- `bin/bundler-audit check` — no known vulnerabilities
 
 ## Authorization
 
@@ -22,6 +23,7 @@ Before any review begins, these must pass:
 ## Database
 
 - [ ] Migrations are reversible (include `change` or paired `up`/`down`)
+- [ ] Migrations pass `strong_migrations` checks (no unsafe operations without `safety_assured`)
 - [ ] New columns with foreign keys have `dependent:` specified on the association
 - [ ] Indexes added for columns used in `WHERE`, `ORDER BY`, or joins
 - [ ] No N+1 queries — use `includes` or `eager_load` for associated data

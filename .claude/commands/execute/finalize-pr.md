@@ -6,6 +6,8 @@ Finalize and prepare PR #$ARGUMENTS for merge.
    - Pull latest from the base branch and rebase if needed
    - Run `bundle exec rubocop -a` — must pass
    - Run `bundle exec rspec` — must pass
+   - Run `bin/brakeman --no-pager -q` — must pass with no new warnings
+   - Run `bin/bundler-audit check` — must pass with no vulnerabilities
    - Check that all review comments have been addressed
    - Verify CI checks are passing with `gh pr checks $ARGUMENTS`
 
