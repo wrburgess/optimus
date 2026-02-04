@@ -1,6 +1,11 @@
 # Optimus
 
-- A template for a Ruby on Rails application
+A Ruby on Rails application template and reference implementation for the MPI Media ecosystem.
+
+## Getting Started
+
+- **New to the project?** Start with the [Human Collaborator Guide](docs/hc-guide.md) — covers your role, the development workflow, commands, what to review, and environment setup.
+- **Looking for infrastructure details?** See the [MPI Infrastructure Guide](docs/architecture/mpi-infrastructure.md) — the full reference for repositories, AC configuration, CI/CD, quality tooling, and standards sync.
 
 ## Cross-Repository Context Setup (Optional)
 
