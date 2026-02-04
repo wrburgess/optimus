@@ -55,11 +55,15 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
   # Bullet — N+1 query detection
-  # Logs warnings to log/bullet.log and Rails logger.
-  # Set Bullet.raise = true once existing N+1 queries are resolved.
+  # Raises Bullet::Notification::UnoptimizedQueryError on N+1 or unused eager loading.
   config.after_initialize do
     Bullet.enable = true
-    Bullet.bullet_logger = true
-    Bullet.rails_logger = true
+    Bullet.raise = true
+
+    # SystemGroup#show loads :system_permissions through :system_roles, which
+    # requires the intermediate system_role_system_permissions join table.
+    # Bullet flags this as an unnecessary eager load on SystemRole, but it is
+    # required for the has_many :through chain to resolve.
+    Bullet.add_safelist type: :unused_eager_loading, class_name: "SystemRole", association: :system_role_system_permissions
   end
 end
