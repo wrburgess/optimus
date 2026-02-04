@@ -1,6 +1,6 @@
 # MPI Code Review Standards
 
-These standards apply to all reviewers: Human Contributors (HC), Claude Code (CC), and Codex (CDX).
+These standards apply to all reviewers: Human Contributors (HC), Claude Code (CC), and GitHub Copilot.
 
 ## Automated Checks (Must Pass)
 

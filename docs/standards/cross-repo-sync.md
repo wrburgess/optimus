@@ -90,7 +90,7 @@ All MPI Rails apps should follow this directory structure for agent configuratio
 ```
 project-root/
 ├── CLAUDE.md                              # Claude Code instructions
-├── AGENTS.md                              # Universal agent instructions (Codex, etc.)
+├── AGENTS.md                              # Universal agent instructions (Copilot, etc.)
 ├── .claude/
 │   ├── settings.json                      # Claude Code permissions and hooks
 │   ├── hooks/

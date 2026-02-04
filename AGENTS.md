@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Instructions for all AI coding agents (Codex, Copilot, Claude Code, and others) working in this repository.
+Instructions for all AI coding agents (Claude Code, Copilot, and others) working in this repository.
 
 ## Project Overview
 
