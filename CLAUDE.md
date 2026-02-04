@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Optimus is the Ruby on Rails application template and reference implementation for the MPI Media application ecosystem. It defines the coding standards, architectural patterns, and development workflows used across all MPI projects.
 
-For detailed architecture documentation, see `docs/architecture/overview.md`.
+For detailed architecture documentation, see `docs/architecture/overview.md`. For the full MPI infrastructure map (repos, AC configuration, CI/CD, standards sync), see `docs/architecture/mpi-infrastructure.md`.
 
 ## Tech Stack
 
@@ -316,6 +316,7 @@ The `docs/` directory contains detailed guides:
 **Architecture:**
 - `docs/architecture/overview.md` — Full architecture overview
 - `docs/architecture/agent-workflow.md` — Agent roles, workflow, Copilot setup
+- `docs/architecture/mpi-infrastructure.md` — Full MPI infrastructure map (repos, AC config, CI/CD, standards sync)
 
 **System Guides:**
 - `docs/system_permissions.md` — Authorization system
