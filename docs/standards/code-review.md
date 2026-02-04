@@ -7,7 +7,7 @@ These standards apply to all reviewers: Human Contributors (HC), Claude Code (CC
 Before any review begins, all four must pass:
 
 - `bundle exec rubocop -a` — zero offenses
-- `bundle exec rspec` — zero failures, coverage above 90% minimum
+- `bundle exec rspec` — zero failures, coverage above baseline minimum (currently 66%, ratcheting toward 90%)
 - `bin/brakeman --no-pager -q` — no new warnings
 - `bin/bundler-audit check` — no known vulnerabilities
 

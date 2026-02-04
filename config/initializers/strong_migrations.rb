@@ -1,6 +1,7 @@
 # Mark existing migrations as safe so strong_migrations only checks new ones.
-# Update this value after running `bin/rails db:migrate` on any new migration.
-StrongMigrations.start_after = 20250203000000
+# Set to the timestamp of the latest existing migration. Update when adding strong_migrations
+# to a project with pre-existing migrations, not on every `db:migrate` run.
+StrongMigrations.start_after = 20260119170658
 
 # Safe PostgreSQL defaults
 StrongMigrations.target_postgresql_version = "17"

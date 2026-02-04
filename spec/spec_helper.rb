@@ -15,6 +15,9 @@ SimpleCov.start "rails" do
   add_group "Components", "app/components"
   add_group "Modules", "app/modules"
   add_group "Services", "app/services"
+  add_group "Helpers", "app/helpers"
+  add_group "Mailers", "app/mailers"
+  add_group "Tasks", "app/tasks"
 
   # Current baseline: 66.74% line, 79.27% branch (as of 2026-02-03)
   # Target: 90% line coverage — refuse_coverage_drop ratchets upward over time
