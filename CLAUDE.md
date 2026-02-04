@@ -335,9 +335,42 @@ After cloning, create `.mcp.json` (gitignored) in the project root:
       "headers": {
         "Authorization": "Bearer YOUR_CONTEXT7_API_KEY"
       }
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer YOUR_GITHUB_TOKEN"
+      }
     }
   }
 }
 ```
 
-Get a Context7 API key from [Context7](https://context7.com).
+- **Context7** — Up-to-date library documentation. Get an API key from [Context7](https://context7.com).
+- **GitHub** — Structured GitHub API access for issues, PRs, reviews, and cross-repo operations. Use a GitHub token from `gh auth token`.
+
+## Plugins
+
+### Required Plugins
+
+Install these Claude Code plugins after initial setup:
+
+```bash
+# Ruby LSP — real-time code intelligence and diagnostics
+claude plugin marketplace add boostvolt/claude-code-lsps
+claude plugin install solargraph@claude-code-lsps
+
+# Prerequisite: solargraph gem
+gem install solargraph
+```
+
+### LSP Environment
+
+Add to your shell profile (`~/.zshrc` or `~/.bashrc`):
+
+```bash
+export ENABLE_LSP_TOOL=1
+```
+
+This enables Claude Code to use Language Server Protocol for real-time error detection, jump-to-definition, and find-references during editing sessions.
