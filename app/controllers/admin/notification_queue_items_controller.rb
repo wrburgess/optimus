@@ -2,7 +2,7 @@ class Admin::NotificationQueueItemsController < AdminController
   def index
     @q = controller_class.ransack(params[:q])
     @q.sorts = controller_class.default_sort if @q.sorts.empty?
-    @pagy, @instances = pagy(@q.result.includes(:notification_message, :notification_subscription, :user))
+    @pagy, @instances = pagy(@q.result.includes(:user))
     @instance = controller_class.new
   end
 

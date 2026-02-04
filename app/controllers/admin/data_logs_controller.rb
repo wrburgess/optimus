@@ -2,7 +2,7 @@ class Admin::DataLogsController < AdminController
   def index
     @q = controller_class.ransack(params[:q])
     @q.sorts = controller_class.default_sort if @q.sorts.empty?
-    @pagy, @instances = pagy(@q.result)
+    @pagy, @instances = pagy(@q.result.includes(:user, :loggable))
     @instance = controller_class.new
   end
 
