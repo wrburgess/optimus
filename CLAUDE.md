@@ -406,6 +406,26 @@ After cloning, copy `.mcp.json.example` to `.mcp.json` (gitignored) and fill in 
       "env": {
         "HEROKU_API_KEY": "YOUR_HEROKU_API_KEY"
       }
+    },
+    "awslabs.core-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.core-mcp-server@latest"],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "YOUR_AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY": "YOUR_AWS_SECRET_ACCESS_KEY",
+        "AWS_REGION": "us-east-1",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    },
+    "awslabs.s3-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.s3-mcp-server@latest"],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "YOUR_AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY": "YOUR_AWS_SECRET_ACCESS_KEY",
+        "AWS_REGION": "us-east-1",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
     }
   }
 }
@@ -420,6 +440,22 @@ cp .mcp.json.example .mcp.json
 - **Context7** — Up-to-date library documentation. Get an API key from [Context7](https://context7.com).
 - **GitHub** — Structured GitHub API access for issues, PRs, reviews, and cross-repo operations. Use a GitHub token from `gh auth token`.
 - **Heroku** — App management, logs, database info, and scaling. Get a token from `heroku auth:token`.
+- **AWS Core** — Required orchestrator for all AWS MCP servers. Coordinates service-specific servers and manages shared AWS authentication. Must be configured before any other AWS MCP servers.
+- **AWS S3** — S3 bucket operations including listing, reading, and managing objects. Requires AWS Core to be configured alongside it.
+
+**AWS MCP server prerequisites:**
+
+The AWS MCP servers use `uvx` (from the `uv` Python package manager) as their runtime. Install `uv` before configuring AWS servers:
+
+```bash
+# macOS (Homebrew)
+brew install uv
+
+# Or via pip
+pip install uv
+```
+
+AWS credentials can be obtained from the AWS IAM console. Set `AWS_REGION` to your primary region (default: `us-east-1`). The `FASTMCP_LOG_LEVEL` environment variable controls logging verbosity for the MCP server runtime; set to `ERROR` to reduce noise, or `DEBUG` for troubleshooting.
 
 ## Plugins
 
