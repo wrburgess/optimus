@@ -88,6 +88,18 @@ When reviewing code, check for:
 - Performance optimizations
 - Additional edge case coverage
 
+## Multi-Agent Coordination
+
+When multiple agents work on the same feature:
+
+- **File ownership is exclusive** — no two agents modify the same file simultaneously
+- **Shared interfaces must be defined upfront** — method signatures, model attributes, route paths
+- **Migrations belong to one agent** — typically the model/data stream
+- **Each agent runs pre-commit checks on its own scope** before committing
+- **One agent handles integration** — merges streams, runs full test suite, creates PR
+
+See `docs/architecture/agent-workflow.md` for the full multi-agent workflow and orchestration patterns.
+
 ## Architecture
 
 ### Authorization

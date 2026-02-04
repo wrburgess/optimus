@@ -129,6 +129,71 @@ GitHub Copilot can also review PRs natively:
 
 Both Codex and Copilot can be enabled simultaneously — they review independently.
 
+## Multi-Agent Patterns
+
+### When to Use Multiple Agents
+
+| Scenario | Strategy | Example |
+|----------|----------|---------|
+| Small feature (< 5 files) | Single agent, simple branch | Add a field to a form |
+| Medium feature (5-15 files) | Single agent, evaluate worktree | New CRUD resource |
+| Large feature (15+ files, independent subsystems) | Parallel agents via worktrees | New module with models, controllers, views, specs |
+| Urgent hotfix alongside feature work | Worktree for isolation | Fix bug on main while feature branch continues |
+
+### Parallel Agent Workflow
+
+When a plan calls for parallel agents, use the `/project:orch NNN` command to generate an orchestration plan. The workflow is:
+
+```
+1. HC approves plan with parallel strategy
+        │
+2. CC creates orchestration plan (/project:orch NNN)
+   ├── Defines work streams with exclusive file ownership
+   ├── Creates worktrees via wt create <branch>
+   └── Posts orchestration plan on Issue
+        │
+3. HC approves orchestration plan
+        │
+4. Agents execute in parallel
+   ├── Agent A: Stream 1 (e.g., models + migrations)
+   ├── Agent B: Stream 2 (e.g., controllers + views)
+   └── Each agent runs pre-commit checks on their scope
+        │
+5. Integration
+   ├── First stream merges to integration branch
+   ├── Subsequent streams rebase and merge
+   ├── Full test suite runs on integrated code
+   └── Single PR created from integration branch
+        │
+6. Normal review flow continues (Codex review → rtr → final)
+```
+
+### File Ownership Rules
+
+When multiple agents work in parallel, conflicts are prevented through exclusive file ownership:
+
+- **No two agents modify the same file** — if they must, one owns it and the other waits
+- **Shared interfaces are defined upfront** — method signatures, model attributes, route paths
+- **Database migrations belong to one stream** — typically the model/data stream
+- **Spec files follow their source** — the agent that writes `app/models/foo.rb` also writes `spec/models/foo_spec.rb`
+
+### Worktree vs Worktrunk Decision
+
+| Tool | When to Use |
+|------|-------------|
+| `git worktree add` | One-off isolation, simple parallel work |
+| `wt create` (Worktrunk) | Multi-agent work needing shared hooks, config, and commit message generation |
+| Simple branch | Single agent, single focus, no isolation needed |
+
+### Agent Communication
+
+Agents coordinate through:
+
+1. **Issue comments** — orchestration plan defines contracts between streams
+2. **Shared interface definitions** — method signatures and expected behavior documented before work starts
+3. **Completion signals** — each agent commits and pushes when their stream is done
+4. **Integration agent** — one agent (usually Main) handles merging all streams
+
 ## Command Quick Reference
 
 | Command | Abbreviation | Purpose |
@@ -140,3 +205,4 @@ Both Codex and Copilot can be enabled simultaneously — they review independent
 | `/project:execute/implement NNN` | `/project:impl NNN` | Execute plan, create PR |
 | `/project:execute/respond-to-review NNN` | `/project:rtr NNN` | Read and respond to review |
 | `/project:execute/finalize-pr NNN` | `/project:final NNN` | Post SOW, prepare for merge |
+| `/project:plan/orchestrate NNN` | `/project:orch NNN` | Design multi-agent orchestration |

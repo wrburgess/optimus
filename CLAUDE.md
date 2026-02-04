@@ -149,6 +149,22 @@ Every AI agent (Claude, Copilot, Codex, or any other) **must** include attributi
 
 If multiple agents contribute to the same commit, include a `Co-Authored-By` line for each.
 
+## Agent Strategy
+
+When planning implementation, evaluate the optimal agent approach:
+
+- **Single agent** — Default for most work. One agent, one branch, sequential tasks. Use when scope is < 15 files or tasks are tightly coupled.
+- **Parallel agents** — Use when tasks are independent across subsystems (e.g., models vs controllers vs frontend). Each agent gets its own worktree with exclusive file ownership. No two agents modify the same file.
+- **Background agents** — Use for long-running tasks (full test suite, linting large changeset) while the main agent continues other work.
+
+For parallel work, use `/project:orch NNN` to generate an orchestration plan that defines work streams, file ownership, shared interfaces, and integration order. See `docs/architecture/agent-workflow.md` for detailed multi-agent patterns.
+
+### Worktree Usage
+
+- **Simple branch** (`git checkout -b`) — Single agent, single focus
+- **Worktree** (`git worktree add`) — Isolation for parallel work or hotfixes alongside feature branches
+- **Worktrunk** (`wt create`) — Preferred for multi-agent parallel work with shared hooks and config
+
 ## Architecture
 
 ### Authorization System
