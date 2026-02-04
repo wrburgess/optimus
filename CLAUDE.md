@@ -282,7 +282,7 @@ See `docs/notification_system.md` and `docs/notification_system_agent_guide.md` 
   - `controller_setup` — User with full permissions for controller specs
   - `policy_setup` — User with full permissions for policy specs
 - `login_user` macro available for authentication in specs
-- Bullet detects N+1 queries in development (alerts) and test (raises errors)
+- Bullet detects N+1 queries in development (alerts) and test (logs warnings)
 - Rubocop uses **rubocop-rails-omakase** with `rubocop-rspec`, `rubocop-capybara`, `rubocop-factory_bot` plugins
 
 ## Key Gems
@@ -294,7 +294,7 @@ See `docs/notification_system.md` and `docs/notification_system_agent_guide.md` 
 - **Pagy** — Pagination
 - **maintenance_tasks** — Data maintenance scripts
 - **caxlsx_rails** — Excel exports
-- **Bullet** — N+1 query detection (development alerts, test failures)
+- **Bullet** — N+1 query detection (development alerts, test logging)
 - **SimpleCov** — Test coverage enforcement (90% target, ratchet-up)
 - **strong_migrations** — Migration safety checks
 
@@ -308,6 +308,9 @@ The `docs/` directory contains detailed guides:
 - `docs/standards/documentation.md` — When and where to write docs
 - `docs/standards/design.md` — UI/UX patterns, component conventions, Hotwire usage
 - `docs/standards/style.md` — Ruby, CSS, JS, ERB style and naming conventions
+- `docs/standards/hotwire-patterns.md` — Turbo Frames, Turbo Streams, Stimulus patterns, anti-patterns
+- `docs/standards/caching.md` — Fragment caching, Russian doll caching, SolidCache, invalidation
+- `docs/standards/query-patterns.md` — ActiveRecord query optimization, eager loading, batch processing
 - `docs/standards/hc-review-checklist.md` — What human reviewers should check that agents miss
 - `docs/standards/cross-repo-sync.md` — Shared vs project-specific standards, sync process
 
@@ -324,6 +327,7 @@ The `docs/` directory contains detailed guides:
 - `docs/credentials_management.md` — Managing Rails credentials
 - `docs/dependency_management.md` — Dependency updates
 - `docs/asset_pipeline.md` — Frontend asset management
+- `docs/deployment.md` — Kamal deployment configuration and procedures (in planning)
 
 ## Related Projects
 

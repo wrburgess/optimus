@@ -8,7 +8,7 @@
 - WebMock to prevent accidental external HTTP calls
 - VCR for recording HTTP cassettes
 - SimpleCov for test coverage enforcement
-- Bullet for N+1 query detection (raises in test, alerts in development)
+- Bullet for N+1 query detection (logs in test, alerts in development)
 
 ## N+1 Query Detection (Bullet)
 

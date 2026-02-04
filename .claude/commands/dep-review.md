@@ -19,6 +19,8 @@ Review a Dependabot or dependency update PR #$ARGUMENTS and assess its impact.
    bundle install
    bundle exec rspec
    bundle exec rubocop -a
+   bin/brakeman --no-pager -q
+   bin/bundler-audit check
    ```
 7. **Post assessment** as a PR comment using `gh pr comment $ARGUMENTS --body "..."`:
 
@@ -42,6 +44,8 @@ Review a Dependabot or dependency update PR #$ARGUMENTS and assess its impact.
 ### Test Results
 - RSpec: [X examples, Y failures]
 - Rubocop: [result]
+- Brakeman: [result]
+- Bundler-audit: [result]
 
 ### Notes
 - [Any additional context, deprecation warnings, migration steps needed]

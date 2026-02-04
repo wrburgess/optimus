@@ -19,6 +19,9 @@ These standards apply to **all** MPI Rails applications (optimus, avails, sfa, h
 | Code review checklist | `docs/standards/code-review.md` | Authorization, security, database, pattern checks |
 | Documentation standards | `docs/standards/documentation.md` | When/where to write docs, inline comment rules |
 | Style conventions | `docs/standards/style.md` | Rubocop omakase, naming conventions |
+| Hotwire patterns | `docs/standards/hotwire-patterns.md` | Turbo Frames, Streams, Stimulus conventions |
+| Caching standards | `docs/standards/caching.md` | Fragment caching, invalidation, SolidCache |
+| Query patterns | `docs/standards/query-patterns.md` | Eager loading, batch processing, optimization |
 | HC review checklist | `docs/standards/hc-review-checklist.md` | Business logic, UX, data integrity, agent concerns |
 | Review severity levels | `AGENTS.md` | P0/P1/P2 definitions |
 | Agent workflow | `docs/architecture/agent-workflow.md` | CC/CDX/Copilot roles and workflow steps |
@@ -116,6 +119,9 @@ project-root/
     │   ├── documentation.md              # Documentation standards (shared)
     │   ├── design.md                     # Design standards (project-specific)
     │   ├── style.md                      # Style standards (shared)
+    │   ├── hotwire-patterns.md           # Hotwire patterns (shared)
+    │   ├── caching.md                    # Caching standards (shared)
+    │   ├── query-patterns.md             # Query optimization (shared)
     │   ├── hc-review-checklist.md        # HC review checklist (shared)
     │   └── cross-repo-sync.md            # This document (shared)
     └── research/                          # Research notes
