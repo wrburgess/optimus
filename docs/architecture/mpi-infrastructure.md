@@ -101,7 +101,7 @@ This repo previously held shared Claude Code instructions (`CLAUDE.base.md`, `CL
 |---------|------|------|------|
 | **Optimus** | `mpimedia/optimus` | Template and standards source | Rails, PostgreSQL, Hotwire |
 | **Avails** | `mpimedia/avails` | Central data repository | Rails, PostgreSQL |
-| **SFA** | `mpimedia/sfa` | Video clip hosting and search | Rails, PostgreSQL, Elasticsearch |
+| **SFA** | `mpimedia/wpa_film_library` | Video clip hosting and search | Rails, PostgreSQL, Elasticsearch |
 | **Garden** | `mpimedia/garden` | Static site generator | Rails |
 | **Harvest** | `mpimedia/harvest` | Ecommerce platform | Rails, PostgreSQL |
 
@@ -357,6 +357,140 @@ Use the `/dep-review NNN` command to review these PRs.
 
 ---
 
+## Required Quality Tooling
+
+Every MPI Rails application must include the following gems and configuration. These are non-negotiable — they form the quality gates that CI enforces and that ACs/HCs must pass before committing.
+
+### Security Scanning
+
+| Gem | Group | Purpose | CI Integration |
+|-----|-------|---------|----------------|
+| `brakeman` | `:development` | Static analysis for security vulnerabilities (SQL injection, XSS, etc.) | Runs via `ci-rails.yml` when `security_scan: true` (default) |
+| `bundler-audit` | `:development` | Checks for known vulnerabilities in gem dependencies | Runs via `ci-rails.yml` when `security_scan: true` (default) |
+
+**Required binstubs:** `bin/brakeman`, `bin/bundler-audit`
+
+**CI requirement:** `security_scan` must be `true` (the default) in the CI workflow. Never set `security_scan: false` without a tracking issue and timeline to re-enable.
+
+### Linting
+
+| Gem | Group | Purpose |
+|-----|-------|---------|
+| `rubocop` | `:development, :test` | Ruby linter and formatter |
+| `rubocop-rails-omakase` | `:development, :test` | Opinionated Rails baseline (replaces manual rubocop-rails config) |
+| `rubocop-rspec` | `:development, :test` | RSpec-specific cops |
+| `rubocop-capybara` | `:development, :test` | Capybara-specific cops |
+| `rubocop-factory_bot` | `:development, :test` | FactoryBot-specific cops |
+
+**`.rubocop.yml` must** inherit from `rubocop-rails-omakase` and require all plugins:
+
+```yaml
+inherit_gem:
+  rubocop-rails-omakase: rubocop.yml
+
+require:
+  - rubocop-rspec
+  - rubocop-capybara
+  - rubocop-factory_bot
+```
+
+### Test Coverage
+
+| Gem | Group | Purpose |
+|-----|-------|---------|
+| `simplecov` | `:test` | Test coverage measurement and enforcement |
+
+**Configuration requirements:**
+- Minimum coverage target: **90%**
+- Ratchet-up approach: coverage cannot drop below the previous baseline
+- Must be required at the top of `spec/rails_helper.rb` (before any other requires):
+
+```ruby
+require "simplecov"
+SimpleCov.start "rails" do
+  enable_coverage :branch
+  minimum_coverage line: 90, branch: 80
+end
+```
+
+### N+1 Query Detection
+
+| Gem | Group | Purpose |
+|-----|-------|---------|
+| `bullet` | `:development, :test` | Detects N+1 queries, unused eager loading, and missing counter caches |
+
+**Must be in both `:development` and `:test` groups.** Development-only means N+1 queries won't be caught in CI.
+
+**Configuration required** in `config/environments/development.rb`:
+
+```ruby
+config.after_initialize do
+  Bullet.enable = true
+  Bullet.alert = true
+  Bullet.bullet_logger = true
+  Bullet.console = true
+  Bullet.rails_logger = true
+  Bullet.add_footer = true
+end
+```
+
+And in `config/environments/test.rb`:
+
+```ruby
+config.after_initialize do
+  Bullet.enable = true
+  Bullet.bullet_logger = true
+  Bullet.raise = true
+end
+```
+
+### Migration Safety
+
+| Gem | Group | Purpose |
+|-----|-------|---------|
+| `strong_migrations` | default (all environments) | Blocks unsafe migration operations before they reach production |
+
+Catches: adding columns with defaults on large tables, removing columns without `safety_assured`, renaming tables, changing column types, and other destructive operations. Follow the suggested safe alternative in error messages. Use `safety_assured { }` only when verified safe for production data.
+
+### Testing Framework
+
+| Gem | Group | Purpose |
+|-----|-------|---------|
+| `rspec-rails` | `:development, :test` | Test framework |
+| `factory_bot_rails` | `:development, :test` | Test data factories (not fixtures) |
+| `shoulda-matchers` | `:test` | One-liner model/association/validation tests |
+| `pundit-matchers` | `:test` | Policy spec assertions (for Pundit-based apps) |
+| `capybara` | `:test` | Feature/integration test DSL |
+| `selenium-webdriver` | `:test` | Browser driver for feature specs |
+
+### Pre-Commit Check Summary
+
+Every commit must pass all four gates. This applies to both ACs and HCs:
+
+```bash
+bundle exec rubocop -a       # Lint (rubocop-rails-omakase + plugins)
+bundle exec rspec             # Tests (SimpleCov enforces coverage)
+bin/brakeman --no-pager -q    # Security static analysis
+bin/bundler-audit check       # Vulnerable dependency check
+```
+
+CI runs the same checks via the shared `ci-rails.yml` workflow. If it passes locally, it passes in CI.
+
+### Gemfile Group Requirements
+
+Gems must be in the correct Bundler groups to ensure they're available in all needed environments:
+
+| Group | When Available | Gems |
+|-------|---------------|------|
+| default (no group) | All environments | `strong_migrations` |
+| `:development` | Dev only | `brakeman`, `bundler-audit` |
+| `:development, :test` | Dev + test + CI | `rubocop` stack, `rspec-rails`, `factory_bot_rails`, `bullet` |
+| `:test` | Test + CI only | `simplecov`, `shoulda-matchers`, `pundit-matchers`, `capybara`, `selenium-webdriver` |
+
+**Common mistake:** Putting linting/testing gems in `:development` only. CI typically runs in the test environment, so gems in `:development` only may not be available in CI unless the workflow explicitly installs development dependencies.
+
+---
+
 ## Standards Sync
 
 ### Shared vs Project-Specific
@@ -364,6 +498,8 @@ Use the `/dep-review NNN` command to review these PRs.
 Standards fall into two categories. See `docs/standards/cross-repo-sync.md` for the full matrix.
 
 **Shared (universal MPI rules)** — Must be consistent across all apps:
+- Quality tooling: required gems, Gemfile groups, configuration (see "Required Quality Tooling" above)
+- CI/CD: shared workflows, SHA pinning, `security_scan: true`
 - Agent attribution, branch permissions, commit/PR format
 - Testing conventions, code review checklist, style conventions
 - Hotwire patterns, caching standards, query patterns
@@ -408,7 +544,17 @@ CLAUDE.md                              # Adapt project-specific sections
 .mcp.json.example                      # Copy as-is
 ```
 
-### 3. Set up CI workflows
+### 3. Install required quality gems
+
+Add all gems from the "Required Quality Tooling" section to the Gemfile in the correct groups. Then configure:
+
+- SimpleCov in `spec/rails_helper.rb` (90% ratchet)
+- Bullet in `config/environments/development.rb` and `config/environments/test.rb`
+- strong_migrations (install: `rails generate strong_migrations:install`)
+- `.rubocop.yml` inheriting from `rubocop-rails-omakase` with all plugins
+- Binstubs: `bin/brakeman`, `bin/bundler-audit`
+
+### 4. Set up CI workflows
 
 Create thin workflow files that delegate to `mpi-application-workflows`:
 
@@ -421,7 +567,7 @@ Create thin workflow files that delegate to `mpi-application-workflows`:
 
 Use the examples from the `mpi-application-workflows` README, pinning to the current SHA.
 
-### 4. Copy shared standards docs
+### 5. Copy shared standards docs
 
 ```
 docs/architecture/agent-workflow.md
@@ -436,14 +582,14 @@ docs/standards/cross-repo-sync.md
 docs/standards/documentation.md
 ```
 
-### 5. Create project-specific docs
+### 6. Create project-specific docs
 
 ```
 docs/architecture/overview.md          # Unique to this project
 docs/standards/design.md               # Unique to this project
 ```
 
-### 6. Personal setup (each HC/AC operator)
+### 7. Personal setup (each HC/AC operator)
 
 ```bash
 # Create personal settings
