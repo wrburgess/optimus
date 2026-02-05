@@ -22,7 +22,7 @@ gem "jsbundling-rails", "1.3.1"
 gem "jwt", "3.1.2"
 gem "kamal", require: false
 gem "maintenance_tasks", "2.13.0"
-gem "pagy", "43.2.8"
+gem "pagy", "43.2.9"
 gem "pg", "1.6.3"
 gem "pghero", "3.7.0"
 gem "postmark-rails", "0.22.1"

@@ -302,7 +302,7 @@ GEM
       racc (~> 1.4)
     orm_adapter (0.5.0)
     ostruct (0.6.3)
-    pagy (43.2.8)
+    pagy (43.2.9)
       json
       yaml
     parallel (1.27.0)
@@ -604,7 +604,7 @@ DEPENDENCIES
   kamal
   lookbook (= 2.3.14)
   maintenance_tasks (= 2.13.0)
-  pagy (= 43.2.8)
+  pagy (= 43.2.9)
   pg (= 1.6.3)
   pghero (= 3.7.0)
   postmark-rails (= 0.22.1)
@@ -754,7 +754,7 @@ CHECKSUMS
   nokogiri (1.19.0-x86_64-linux-musl) sha256=1c4ca6b381622420073ce6043443af1d321e8ed93cc18b08e2666e5bd02ffae4
   orm_adapter (0.5.0) sha256=aa5d0be5d540cbb46d3a93e88061f4ece6a25f6e97d6a47122beb84fe595e9b9
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
-  pagy (43.2.8) sha256=3d38376df4a9a7893361bb68825643896371707c4c49ef73acf1bd3b50af7562
+  pagy (43.2.9) sha256=6a167c8da72388883e8f4c8e29dc8f5577f9f934d8d0b704cb2f39d2cebd276e
   parallel (1.27.0) sha256=4ac151e1806b755fb4e2dc2332cbf0e54f2e24ba821ff2d3dcf86bf6dc4ae130
   parser (3.3.10.1) sha256=06f6a725d2cd91e5e7f2b7c32ba143631e1f7c8ae2fb918fc4cebec187e6a688
   pg (1.6.3) sha256=1388d0563e13d2758c1089e35e973a3249e955c659592d10e5b77c468f628a99
@@ -863,4 +863,4 @@ RUBY VERSION
   ruby 4.0.1
 
 BUNDLED WITH
-  4.0.5
+  4.0.6
