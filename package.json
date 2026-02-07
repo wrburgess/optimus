@@ -7,7 +7,7 @@
     "bootstrap-icons": "1.13.1",
     "esbuild": "0.27.3",
     "sass": "1.97.3",
-    "tom-select": "2.4.5"
+    "tom-select": "2.4.6"
   },
   "name": "optimus",
   "repository": "git@github.com:mpimedia/optimus.git",
